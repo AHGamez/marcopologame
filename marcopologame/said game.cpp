@@ -392,6 +392,133 @@ Camel createCamelChoice(int choice) {
     }
 }
 
+// Add this new class for random events
+class RandomEvent {
+public:
+    enum EventType {
+        CAMEL_DEATH,
+        BOAT_SINKING,
+        BANDIT_ATTACK,
+        DISEASE_OUTBREAK,
+        STORM,
+        FOOD_SPOILAGE,
+        NO_EVENT
+    };
+
+    static EventType generateRandomEvent(int legNumber) {
+        int rand_val = rand() % 100;
+        
+        // Increasing danger as journey progresses
+        if (legNumber < 3) rand_val += 20;  // First legs safer
+        if (legNumber > 9) rand_val -= 20;  // Later legs more dangerous
+        
+        if (rand_val < 10) return CAMEL_DEATH;
+        if (rand_val < 20) return BOAT_SINKING;
+        if (rand_val < 35) return BANDIT_ATTACK;
+        if (rand_val < 50) return DISEASE_OUTBREAK;
+        if (rand_val < 65) return STORM;
+        if (rand_val < 80) return FOOD_SPOILAGE;
+        return NO_EVENT;
+    }
+
+    static string getEventDescription(EventType event) {
+        switch (event) {
+            case CAMEL_DEATH:
+                return "Your camel has fallen ill and died from the harsh desert conditions!";
+            case BOAT_SINKING:
+                return "Your boat has sprung a leak! You must make emergency repairs!";
+            case BANDIT_ATTACK:
+                return "Bandits have attacked your caravan! You must defend your supplies!";
+            case DISEASE_OUTBREAK:
+                return "Illness has spread through your party! Medical supplies are needed!";
+            case STORM:
+                return "A terrible storm has struck! You must take shelter and wait it out!";
+            case FOOD_SPOILAGE:
+                return "Much of your food has spoiled in the heat and humidity!";
+            default:
+                return "No incidents occurred.";
+        }
+    }
+
+    static void handleEvent(EventType event, SupplyTracker& tracker, Camel& camel, Boat& boat, bool& journeyEnded) {
+        int wheatLoss = 0;
+        int foodLoss = 0;
+        
+        switch (event) {
+            case CAMEL_DEATH:
+                std::cout << "\n*** RANDOM EVENT: CAMEL DEATH ***\n";
+                std::cout << getEventDescription(event) << "\n";
+                camel.setAge(999);  // Mark camel as dead
+                std::cout << "You lose your camel and must continue on foot!\n";
+                std::cout << "Your travel speed decreases significantly.\n";
+                break;
+
+            case BOAT_SINKING:
+                std::cout << "\n*** RANDOM EVENT: BOAT DAMAGE ***\n";
+                std::cout << getEventDescription(event) << "\n";
+                tracker.addSupplies(-20, -15, -5, -50);
+                std::cout << "Supplies lost: 20 wheat, 15 camel food, 5 weaponry, 50 coins\n";
+                break;
+
+            case BANDIT_ATTACK:
+                std::cout << "\n*** RANDOM EVENT: BANDIT ATTACK ***\n";
+                std::cout << getEventDescription(event) << "\n";
+                if (tracker.getWeaponry() > 0) {
+                    std::cout << "You defend yourself with your weapons!\n";
+                    tracker.addSupplies(0, 0, -5, -100);
+                    std::cout << "You lose: 5 weaponry, 100 coins\n";
+                } else {
+                    std::cout << "You have no weapons to defend yourself!\n";
+                    tracker.addSupplies(-25, -20, 0, -150);
+                    std::cout << "You lose: 25 wheat, 20 camel food, 150 coins\n";
+                }
+                break;
+
+            case DISEASE_OUTBREAK:
+                std::cout << "\n*** RANDOM EVENT: DISEASE OUTBREAK ***\n";
+                std::cout << getEventDescription(event) << "\n";
+                tracker.addSupplies(-15, -10, 0, -75);
+                std::cout << "Your party wastes resources fighting the illness.\n";
+                std::cout << "You lose: 15 wheat, 10 camel food, 75 coins\n";
+                break;
+
+            case STORM:
+                std::cout << "\n*** RANDOM EVENT: SEVERE STORM ***\n";
+                std::cout << getEventDescription(event) << "\n";
+                tracker.addSupplies(-10, -8, 0, 0);
+                std::cout << "You're trapped for days, consuming supplies.\n";
+                std::cout << "You lose: 10 wheat, 8 camel food\n";
+                break;
+
+            case FOOD_SPOILAGE:
+                std::cout << "\n*** RANDOM EVENT: FOOD SPOILAGE ***\n";
+                std::cout << getEventDescription(event) << "\n";
+                wheatLoss = tracker.getWheat() / 3;
+                foodLoss = tracker.getCamelFood() / 3;
+                tracker.addSupplies(-wheatLoss, -foodLoss, 0, 0);
+                std::cout << "You lose: " << wheatLoss << " wheat, " << foodLoss << " camel food\n";
+                break;
+
+            case NO_EVENT:
+                std::cout << "\n*** Travel uneventful. Clear skies ahead. ***\n";
+                break;
+        }
+
+        // Check for critical failures
+        if (camel.getAge() == 999) {
+            std::cout << "\n*** CRITICAL FAILURE: You cannot continue without a camel! ***\n";
+            std::cout << "GAME OVER\n";
+            journeyEnded = true;
+        }
+
+        if (tracker.getWheat() < 0 || tracker.getCamelFood() < 0) {
+            std::cout << "\n*** CRITICAL: You have run out of supplies! ***\n";
+            std::cout << "GAME OVER\n";
+            journeyEnded = true;
+        }
+    }
+};
+
 int main() {
     std::cout << "Welcome to My Game - Marco Polo's Journey to China and Back!\n\n";
 
