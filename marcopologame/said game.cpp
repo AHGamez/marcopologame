@@ -150,15 +150,17 @@ private:
     int camelFood;
     int weaponry;
     int money;
+    int patchKit;
 
 public:
-    SupplyTracker(int w = 0, int cf = 0, int weap = 0, int m = 0)
-        : wheat(w), camelFood(cf), weaponry(weap), money(m) {}
+    SupplyTracker(int w = 0, int cf = 0, int weap = 0, int m = 0, int pk = 0)
+        : wheat(w), camelFood(cf), weaponry(weap), money(m), patchKit(pk) {}
 
     int getWheat() const { return wheat; }
     int getCamelFood() const { return camelFood; }
     int getWeaponry() const { return weaponry; }
     int getMoney() const { return money; }
+    int getPatchKit() const { return patchKit; }
 
     bool buySupplies(int wAmount, int cfAmount, int wpAmount, int mAmount) {
         if (wheat >= wAmount && camelFood >= cfAmount && weaponry >= wpAmount && money >= mAmount) {
@@ -171,11 +173,12 @@ public:
         return false;
     }
 
-    void addSupplies(int wAmount, int cfAmount, int wpAmount, int mAmount) {
+    void addSupplies(int wAmount, int cfAmount, int wpAmount, int mAmount, int pkAmount = 0) {
         wheat += wAmount;
         camelFood += cfAmount;
         weaponry += wpAmount;
         money += mAmount;
+        patchKit += pkAmount;
     }
 
     void displaySupplyStatus() const {
@@ -183,6 +186,7 @@ public:
         std::cout << "Wheat: " << wheat << " units\n";
         std::cout << "Camel Food: " << camelFood << " units\n";
         std::cout << "Weaponry: " << weaponry << " units\n";
+        std::cout << "Patch Kit: " << patchKit << " unit(s)\n";
         std::cout << "Money: " << money << " coins\n";
     }
 
@@ -286,7 +290,6 @@ void displayBoatMenu() {
     std::cout << "6. Old Dhow (2 sails, 25 years old, 800 lbs, 5 tons cargo) - TOO OLD\n";
 }
 
-// Add this new function to display boat purchasing options
 void displayBoatPurchaseMenu() {
     std::cout << "\n=== Boat Purchase Menu for Ocean Voyage ===\n";
     std::cout << "You must purchase a vessel for the upcoming ocean voyage.\n";
@@ -359,7 +362,6 @@ Boat createBoatChoice(int choice) {
     }
 }
 
-// Add this function to create boats for ocean purchase
 Boat createOceanBoatChoice(int choice) {
     switch (choice) {
         case 1: return Boat("Venetian Galley", 3, 8, 2000, 8, "Supplies, Cargo");
@@ -392,12 +394,13 @@ Camel createCamelChoice(int choice) {
     }
 }
 
-// Add this new class for random events
+// Random event class with BOAT_HOLE support
 class RandomEvent {
 public:
     enum EventType {
         CAMEL_DEATH,
         BOAT_SINKING,
+        BOAT_HOLE,
         BANDIT_ATTACK,
         DISEASE_OUTBREAK,
         STORM,
@@ -409,15 +412,16 @@ public:
         int rand_val = rand() % 100;
         
         // Increasing danger as journey progresses
-        if (legNumber < 3) rand_val += 20;  // First legs safer
-        if (legNumber > 9) rand_val -= 20;  // Later legs more dangerous
+        if (legNumber < 3) rand_val += 20;
+        if (legNumber > 9) rand_val -= 20;
         
         if (rand_val < 10) return CAMEL_DEATH;
-        if (rand_val < 20) return BOAT_SINKING;
-        if (rand_val < 35) return BANDIT_ATTACK;
-        if (rand_val < 50) return DISEASE_OUTBREAK;
-        if (rand_val < 65) return STORM;
-        if (rand_val < 80) return FOOD_SPOILAGE;
+        if (rand_val < 18) return BOAT_SINKING;
+        if (rand_val < 28) return BOAT_HOLE;
+        if (rand_val < 40) return BANDIT_ATTACK;
+        if (rand_val < 55) return DISEASE_OUTBREAK;
+        if (rand_val < 70) return STORM;
+        if (rand_val < 85) return FOOD_SPOILAGE;
         return NO_EVENT;
     }
 
@@ -427,6 +431,8 @@ public:
                 return "Your camel has fallen ill and died from the harsh desert conditions!";
             case BOAT_SINKING:
                 return "Your boat has sprung a leak! You must make emergency repairs!";
+            case BOAT_HOLE:
+                return "Your boat has developed a hole in the hull!";
             case BANDIT_ATTACK:
                 return "Bandits have attacked your caravan! You must defend your supplies!";
             case DISEASE_OUTBREAK:
@@ -448,7 +454,7 @@ public:
             case CAMEL_DEATH:
                 std::cout << "\n*** RANDOM EVENT: CAMEL DEATH ***\n";
                 std::cout << getEventDescription(event) << "\n";
-                camel.setAge(999);  // Mark camel as dead
+                camel.setAge(999);
                 std::cout << "You lose your camel and must continue on foot!\n";
                 std::cout << "Your travel speed decreases significantly.\n";
                 break;
@@ -458,6 +464,21 @@ public:
                 std::cout << getEventDescription(event) << "\n";
                 tracker.addSupplies(-20, -15, -5, -50);
                 std::cout << "Supplies lost: 20 wheat, 15 camel food, 5 weaponry, 50 coins\n";
+                break;
+
+            case BOAT_HOLE:
+                std::cout << "\n*** RANDOM EVENT: BOAT HOLE ***\n";
+                std::cout << getEventDescription(event) << "\n";
+                if (tracker.getPatchKit() > 0) {
+                    std::cout << "You use a patch kit to repair the hole!\n";
+                    tracker.addSupplies(0, 0, 0, 0, -1);
+                    std::cout << "Patch kit used! You lose: 1 patch kit\n";
+                } else {
+                    std::cout << "You have no patch kit! Water seeps in constantly.\n";
+                    tracker.addSupplies(-10, -5, 0, -25);
+                    std::cout << "You lose: 10 wheat, 5 camel food, 25 coins (water damage)\n";
+                    std::cout << "Consider buying a patch kit at the next stop!\n";
+                }
                 break;
 
             case BANDIT_ATTACK:
@@ -622,7 +643,7 @@ int main() {
         const JourneyStop& currentStop = journeyStops[i];
         currentStop.displayStop();
 
-        // Check if this is an ocean voyage leg - purchase boat
+        // Check if this is an ocean voyage leg
         if ((i == 1 && currentStop.getName() == "Mediterranean Sea Voyage")) {
             
             std::cout << "\n*** OCEAN VOYAGE AHEAD ***\n";
@@ -687,9 +708,10 @@ int main() {
                     std::cout << "1. Buy " << currentStop.getWheatCost() << " Wheat\n";
                     std::cout << "2. Buy " << currentStop.getCamelFoodCost() << " Camel Food\n";
                     std::cout << "3. Buy " << currentStop.getWeaponryCost() << " Weaponry\n";
-                    std::cout << "4. Skip purchases\n";
+                    std::cout << "4. Buy Patch Kit (20 coins) - Repairs boat damage\n";
+                    std::cout << "5. Skip purchases\n";
                     std::cout << "Enter your choice: ";
-                    int buyChoice = getValidInput(1, 4);
+                    int buyChoice = getValidInput(1, 5);
 
                     if (buyChoice == 1) {
                         tracker.addSupplies(currentStop.getWheatCost(), 0, 0, 0);
@@ -700,6 +722,13 @@ int main() {
                     } else if (buyChoice == 3) {
                         tracker.addSupplies(0, 0, currentStop.getWeaponryCost(), 0);
                         std::cout << "Purchased Weaponry!\n";
+                    } else if (buyChoice == 4) {
+                        if (tracker.getMoney() >= 20) {
+                            tracker.addSupplies(0, 0, 0, -20, 1);
+                            std::cout << "Purchased Patch Kit!\n";
+                        } else {
+                            std::cout << "Insufficient funds! You need 20 coins.\n";
+                        }
                     }
                     break;
                 }
@@ -762,6 +791,17 @@ int main() {
             if (tracker.isCriticallyLow()) {
                 std::cout << "\n*** WARNING: Supplies are running low! Stock up at the next stop! ***\n";
             }
+
+            // Generate random event during travel
+            bool journeyEnded = false;
+            RandomEvent::EventType event = RandomEvent::generateRandomEvent(i);
+            RandomEvent::handleEvent(event, tracker, selectedCamel, selectedBoat, journeyEnded);
+            
+            if (journeyEnded) {
+                break;
+            }
+            
+            tracker.displaySupplyStatus();
         }
     }
 
