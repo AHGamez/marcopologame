@@ -151,16 +151,20 @@ private:
     int weaponry;
     int money;
     int patchKit;
+    bool hasGoldenPassport;
 
 public:
-    SupplyTracker(int w = 0, int cf = 0, int weap = 0, int m = 0, int pk = 0)
-        : wheat(w), camelFood(cf), weaponry(weap), money(m), patchKit(pk) {}
+    SupplyTracker(int w = 0, int cf = 0, int weap = 0, int m = 0, int pk = 0, bool passport = false)
+        : wheat(w), camelFood(cf), weaponry(weap), money(m), patchKit(pk), hasGoldenPassport(passport) {}
 
     int getWheat() const { return wheat; }
     int getCamelFood() const { return camelFood; }
     int getWeaponry() const { return weaponry; }
     int getMoney() const { return money; }
     int getPatchKit() const { return patchKit; }
+    bool getGoldenPassport() const { return hasGoldenPassport; }
+
+    void setGoldenPassport(bool value) { hasGoldenPassport = value; }
 
     bool buySupplies(int wAmount, int cfAmount, int wpAmount, int mAmount) {
         if (wheat >= wAmount && camelFood >= cfAmount && weaponry >= wpAmount && money >= mAmount) {
@@ -188,6 +192,9 @@ public:
         std::cout << "Weaponry: " << weaponry << " units\n";
         std::cout << "Patch Kit: " << patchKit << " unit(s)\n";
         std::cout << "Money: " << money << " coins\n";
+        if (hasGoldenPassport) {
+            std::cout << "*** GOLDEN PASSPORT: You possess the Khan's golden passport! (Discount rates active) ***\n";
+        }
     }
 
     bool isCriticallyLow() const {
@@ -322,8 +329,9 @@ void displaySuppliesMenu() {
 void displayStopMenu() {
     std::cout << "\n=== Stop Options ===\n";
     std::cout << "1. Buy Supplies\n";
-    std::cout << "2. Check Supply Status\n";
-    std::cout << "3. Continue Journey\n";
+    std::cout << "2. Trade Camel\n";
+    std::cout << "3. Check Supply Status\n";
+    std::cout << "4. Continue Journey\n";
 }
 
 string getSuppliesChoice(int choice) {
@@ -392,6 +400,16 @@ Camel createCamelChoice(int choice) {
         case 6: return Camel("Desert Camel", 1, 10, 620, 80, "Carpets, Leather, Herbs");
         default: return Camel("Bactrian", 2, 12, 700, 100, "Salt, Dates, Water Skins");
     }
+}
+
+void displayCamelTradingMenu() {
+    std::cout << "\n=== Camel Trading ===\n";
+    std::cout << "Trade your current camel for a new one!\n";
+    std::cout << "1. Bactrian Camel - Trade cost: 50 coins\n";
+    std::cout << "2. Dromedary Camel - Trade cost: 30 coins\n";
+    std::cout << "3. Wild Camel - Trade cost: 70 coins\n";
+    std::cout << "4. Desert Camel - Trade cost: 40 coins\n";
+    std::cout << "5. Skip trading\n";
 }
 
 // Random event class with BOAT_HOLE support
@@ -540,6 +558,66 @@ public:
     }
 };
 
+class AdvancedWeaponry {
+public:
+    enum WeaponType {
+        SWORD,
+        BOW,
+        ARMOR,
+        NONE
+    };
+
+    struct Weapon {
+        WeaponType type;
+        string name;
+        int damageBonus;
+        int cost;
+        string description;
+
+        Weapon() : type(NONE), name("None"), damageBonus(0), cost(0), description("") {}
+        Weapon(WeaponType t, const string& n, int damage, int c, const string& desc)
+            : type(t), name(n), damageBonus(damage), cost(c), description(desc) {}
+    };
+
+    static void displayAdvancedWeaponryMenu() {
+        std::cout << "\n=== Advanced Weaponry - Persia ===\n";
+        std::cout << "Upgrade your combat capabilities!\n";
+        std::cout << "1. Steel Sword (50 coins) - Direct melee damage +20\n";
+        std::cout << "   Description: A finely crafted steel sword for close combat\n";
+        std::cout << "2. Composite Bow (60 coins) - Ranged damage +25\n";
+        std::cout << "   Description: A powerful composite bow for distant threats\n";
+        std::cout << "3. Leather Armor (55 coins) - Defense +15\n";
+        std::cout << "   Description: Protective leather armor to reduce damage\n";
+        std::cout << "4. Full Combat Set (130 coins) - All bonuses!\n";
+        std::cout << "   Description: Sword + Bow + Armor (+20 melee, +25 ranged, +15 defense)\n";
+        std::cout << "5. Skip purchases\n";
+    }
+
+    static Weapon getWeaponChoice(int choice) {
+        switch (choice) {
+            case 1: return Weapon(SWORD, "Steel Sword", 20, 50, 
+                "A finely crafted steel sword for close combat");
+            case 2: return Weapon(BOW, "Composite Bow", 25, 60, 
+                "A powerful composite bow for distant threats");
+            case 3: return Weapon(ARMOR, "Leather Armor", 15, 55, 
+                "Protective leather armor to reduce damage");
+            case 4: return Weapon(NONE, "Full Combat Set", 60, 130, 
+                "Sword + Bow + Armor (all bonuses combined)");
+            default: return Weapon();
+        }
+    }
+
+    static int getWeaponCost(int choice) {
+        switch (choice) {
+            case 1: return 50;
+            case 2: return 60;
+            case 3: return 55;
+            case 4: return 130;
+            default: return 0;
+        }
+    }
+};
+
 int main() {
     std::cout << "Welcome to My Game - Marco Polo's Journey to China and Back!\n\n";
 
@@ -643,6 +721,23 @@ int main() {
         const JourneyStop& currentStop = journeyStops[i];
         currentStop.displayStop();
 
+        // Check if receiving golden passport at Kublai Khan's Court
+        if (i == 5 && currentStop.getName() == "Kublai Khan's Court") {
+            std::cout << "\n*** KUBLAI KHAN'S GIFT ***\n";
+            std::cout << "The great Khan presents you with a Golden Passport!\n";
+            std::cout << "This allows you to purchase supplies at significantly discounted rates!\n";
+            tracker.setGoldenPassport(true);
+        }
+
+        // Check if losing golden passport when Khan dies
+        if (i == 10 && currentStop.getName() == "Return Journey - India") {
+            std::cout << "\n*** SAD NEWS ***\n";
+            std::cout << "You learn that Kublai Khan has passed away...\n";
+            std::cout << "Your golden passport is no longer valid.\n";
+            std::cout << "Prices return to normal.\n";
+            tracker.setGoldenPassport(false);
+        }
+
         // Check if this is an ocean voyage leg
         if ((i == 1 && currentStop.getName() == "Mediterranean Sea Voyage")) {
             
@@ -700,45 +795,110 @@ int main() {
         while (atStop) {
             displayStopMenu();
             std::cout << "Enter your choice: ";
-            int action = getValidInput(1, 3);
+            int action = getValidInput(1, 4);
 
             switch (action) {
                 case 1: {
+                    int wheatPrice = currentStop.getWheatCost();
+                    int camelFoodPrice = currentStop.getCamelFoodCost();
+                    int weaponryPrice = currentStop.getWeaponryCost();
+                    int patchKitPrice = 20;
+
+                    // Apply discount if has golden passport
+                    if (tracker.getGoldenPassport()) {
+                        wheatPrice = (wheatPrice * 3) / 4;  // 25% discount
+                        camelFoodPrice = (camelFoodPrice * 3) / 4;
+                        weaponryPrice = (weaponryPrice * 3) / 4;
+                        patchKitPrice = 15;
+                        std::cout << "\n*** GOLDEN PASSPORT DISCOUNT APPLIED! ***\n";
+                    }
+
                     std::cout << "\nSupply options at this stop:\n";
-                    std::cout << "1. Buy " << currentStop.getWheatCost() << " Wheat\n";
-                    std::cout << "2. Buy " << currentStop.getCamelFoodCost() << " Camel Food\n";
-                    std::cout << "3. Buy " << currentStop.getWeaponryCost() << " Weaponry\n";
-                    std::cout << "4. Buy Patch Kit (20 coins) - Repairs boat damage\n";
-                    std::cout << "5. Skip purchases\n";
+                    std::cout << "1. Buy " << wheatPrice << " Wheat\n";
+                    std::cout << "2. Buy " << camelFoodPrice << " Camel Food\n";
+                    std::cout << "3. Buy " << weaponryPrice << " Weaponry\n";
+                    
+                    // Advanced weaponry in Persia
+                    if (currentStop.getName() == "Persia") {
+                        std::cout << "4. Buy Advanced Weaponry (50 coins) - Stronger defense!\n";
+                        std::cout << "5. Buy Patch Kit (" << patchKitPrice << " coins) - Repairs boat damage\n";
+                        std::cout << "6. Skip purchases\n";
+                    } else {
+                        std::cout << "4. Buy Patch Kit (" << patchKitPrice << " coins) - Repairs boat damage\n";
+                        std::cout << "5. Skip purchases\n";
+                    }
+                    
                     std::cout << "Enter your choice: ";
-                    int buyChoice = getValidInput(1, 5);
+                    int buyChoice;
+                    if (currentStop.getName() == "Persia") {
+                        buyChoice = getValidInput(1, 6);
+                    } else {
+                        buyChoice = getValidInput(1, 5);
+                    }
 
                     if (buyChoice == 1) {
-                        tracker.addSupplies(currentStop.getWheatCost(), 0, 0, 0);
+                        tracker.addSupplies(wheatPrice, 0, 0, 0);
                         std::cout << "Purchased Wheat!\n";
                     } else if (buyChoice == 2) {
-                        tracker.addSupplies(0, currentStop.getCamelFoodCost(), 0, 0);
+                        tracker.addSupplies(0, camelFoodPrice, 0, 0);
                         std::cout << "Purchased Camel Food!\n";
                     } else if (buyChoice == 3) {
-                        tracker.addSupplies(0, 0, currentStop.getWeaponryCost(), 0);
+                        tracker.addSupplies(0, 0, weaponryPrice, 0);
                         std::cout << "Purchased Weaponry!\n";
-                    } else if (buyChoice == 4) {
-                        if (tracker.getMoney() >= 20) {
-                            tracker.addSupplies(0, 0, 0, -20, 1);
+                    } else if (currentStop.getName() == "Persia" && buyChoice == 4) {
+                        if (tracker.getMoney() >= 50) {
+                            tracker.addSupplies(0, 0, 30, -50);
+                            std::cout << "Purchased Advanced Weaponry! (+30 weaponry damage)\n";
+                        } else {
+                            std::cout << "Insufficient funds! You need 50 coins.\n";
+                        }
+                    } else if ((currentStop.getName() == "Persia" && buyChoice == 5) || (currentStop.getName() != "Persia" && buyChoice == 4)) {
+                        if (tracker.getMoney() >= patchKitPrice) {
+                            tracker.addSupplies(0, 0, 0, -patchKitPrice, 1);
                             std::cout << "Purchased Patch Kit!\n";
                         } else {
-                            std::cout << "Insufficient funds! You need 20 coins.\n";
+                            std::cout << "Insufficient funds! You need " << patchKitPrice << " coins.\n";
                         }
                     }
                     break;
                 }
-                case 2:
+                case 2: {
+                    displayCamelTradingMenu();
+                    std::cout << "Enter your choice: ";
+                    int tradeChoice = getValidInput(1, 5);
+
+                    if (tradeChoice != 5) {
+                        int tradeCost;
+                        Camel newCamel = createCamelChoice(tradeChoice == 1 ? 1 : tradeChoice == 2 ? 2 : tradeChoice == 3 ? 3 : 6);
+                        
+                        switch (tradeChoice) {
+                            case 1: tradeCost = 50; break;
+                            case 2: tradeCost = 30; break;
+                            case 3: tradeCost = 70; break;
+                            case 4: tradeCost = 40; break;
+                            default: tradeCost = 50; break;
+                        }
+
+                        if (tracker.getMoney() >= tradeCost) {
+                            tracker.addSupplies(0, 0, 0, -tradeCost);
+                            selectedCamel = newCamel;
+                            std::cout << "\n*** Camel Traded! ***\n";
+                            std::cout << "Your new camel:\n";
+                            selectedCamel.displayInfo();
+                            std::cout << "Money remaining: " << tracker.getMoney() << " coins\n";
+                        } else {
+                            std::cout << "Insufficient funds! You need " << tradeCost << " coins.\n";
+                        }
+                    }
+                    break;
+                }
+                case 3:
                     tracker.displaySupplyStatus();
                     if (tracker.isCriticallyLow()) {
                         std::cout << "\n*** WARNING: Your supplies are critically low! ***\n";
                     }
                     break;
-                case 3:
+                case 4:
                     atStop = false;
                     break;
             }
