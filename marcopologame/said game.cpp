@@ -402,9 +402,38 @@ public:
         std::cout << "3. Set Weaponry\n";
         std::cout << "4. Set Money\n";
         std::cout << "5. Set Patch Kit\n";
-        std::cout << "6. Set All Supplies (Full Bundle)\n";
-        std::cout << "7. Back to Debug Menu\n";
+        std::cout << "6. Set All Supplies Individually\n";
+        std::cout << "7. Set All Supplies (Full Bundle)\n";
+        std::cout << "8. Back to Debug Menu\n";
         std::cout << "Enter your choice: ";
+    }
+
+    static int getSafeIntInput() {
+        string input;
+        while (true) {
+            std::cin >> input;
+            
+            // Check for infinity input
+            if (input == "inf" || input == "infinity" || input == "INF" || input == "INFINITY") {
+                return INT_MAX;  // Return maximum int value
+            }
+            
+            try {
+                // Check for extremely large numbers
+                if (input.length() > 10) {
+                    std::cout << "Value too large! Please enter a reasonable number (or 'inf' for infinity): ";
+                    continue;
+                }
+                int value = std::stoi(input);
+                return value;
+            }
+            catch (const std::exception&) {
+                std::cout << "Invalid input! Please enter a valid number (or 'inf' for infinity): ";
+                std::cin.clear();
+                std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+                continue;
+            }
+        }
     }
 
     static void handleDebugMenu(SupplyTracker& tracker, Camel& camel, Boat& boat) {
@@ -447,8 +476,7 @@ public:
                         case 1: {
                             std::cout << "Current Wheat: " << tracker.getWheat() << "\n";
                             std::cout << "Enter new value: ";
-                            int value;
-                            std::cin >> value;
+                            int value = getSafeIntInput();
                             tracker.setWheat(value);
                             std::cout << "Wheat set to " << value << "\n";
                             break;
@@ -456,8 +484,7 @@ public:
                         case 2: {
                             std::cout << "Current Camel Food: " << tracker.getCamelFood() << "\n";
                             std::cout << "Enter new value: ";
-                            int value;
-                            std::cin >> value;
+                            int value = getSafeIntInput();
                             tracker.setCamelFood(value);
                             std::cout << "Camel Food set to " << value << "\n";
                             break;
@@ -465,8 +492,7 @@ public:
                         case 3: {
                             std::cout << "Current Weaponry: " << tracker.getWeaponry() << "\n";
                             std::cout << "Enter new value: ";
-                            int value;
-                            std::cin >> value;
+                            int value = getSafeIntInput();
                             tracker.setWeaponry(value);
                             std::cout << "Weaponry set to " << value << "\n";
                             break;
@@ -474,8 +500,7 @@ public:
                         case 4: {
                             std::cout << "Current Money: " << tracker.getMoney() << "\n";
                             std::cout << "Enter new value: ";
-                            int value;
-                            std::cin >> value;
+                            int value = getSafeIntInput();
                             tracker.setMoney(value);
                             std::cout << "Money set to " << value << "\n";
                             break;
@@ -483,13 +508,40 @@ public:
                         case 5: {
                             std::cout << "Current Patch Kit: " << tracker.getPatchKit() << "\n";
                             std::cout << "Enter new value: ";
-                            int value;
-                            std::cin >> value;
+                            int value = getSafeIntInput();
                             tracker.setPatchKit(value);
                             std::cout << "Patch Kit set to " << value << "\n";
                             break;
                         }
                         case 6: {
+                            std::cout << "\n=== Set All Supplies Individually ===\n";
+                            
+                            std::cout << "Enter Wheat amount: ";
+                            int wheat = getSafeIntInput();
+                            
+                            std::cout << "Enter Camel Food amount: ";
+                            int camelFood = getSafeIntInput();
+                            
+                            std::cout << "Enter Weaponry amount: ";
+                            int weaponry = getSafeIntInput();
+                            
+                            std::cout << "Enter Money amount: ";
+                            int money = getSafeIntInput();
+                            
+                            std::cout << "Enter Patch Kit amount: ";
+                            int patchKit = getSafeIntInput();
+                            
+                            tracker.setWheat(wheat);
+                            tracker.setCamelFood(camelFood);
+                            tracker.setWeaponry(weaponry);
+                            tracker.setMoney(money);
+                            tracker.setPatchKit(patchKit);
+                            
+                            std::cout << "\nAll supplies updated!\n";
+                            tracker.displaySupplyStatus();
+                            break;
+                        }
+                        case 7: {
                             std::cout << "Setting Full Bundle supplies...\n";
                             tracker.setWheat(100);
                             tracker.setCamelFood(100);
@@ -500,7 +552,7 @@ public:
                             tracker.displaySupplyStatus();
                             break;
                         }
-                        case 7:
+                        case 8:
                             inEditMenu = false;
                             break;
                     }
