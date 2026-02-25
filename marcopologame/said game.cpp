@@ -206,11 +206,31 @@ public:
 
     void displaySupplyStatus() const {
         std::cout << "\n=== Current Supply Status ===\n";
-        std::cout << "Wheat: " << wheat << " units\n";
-        std::cout << "Camel Food: " << camelFood << " units\n";
-        std::cout << "Weaponry: " << weaponry << " units\n";
-        std::cout << "Patch Kit: " << patchKit << " unit(s)\n";
-        std::cout << "Money: " << money << " coins\n";
+        std::cout << "Wheat: ";
+        if (wheat == INT_MAX) std::cout << "inf";
+        else std::cout << wheat;
+        std::cout << " units\n";
+        
+        std::cout << "Camel Food: ";
+        if (camelFood == INT_MAX) std::cout << "inf";
+        else std::cout << camelFood;
+        std::cout << " units\n";
+        
+        std::cout << "Weaponry: ";
+        if (weaponry == INT_MAX) std::cout << "inf";
+        else std::cout << weaponry;
+        std::cout << " units\n";
+        
+        std::cout << "Patch Kit: ";
+        if (patchKit == INT_MAX) std::cout << "inf";
+        else std::cout << patchKit;
+        std::cout << " unit(s)\n";
+        
+        std::cout << "Money: ";
+        if (money == INT_MAX) std::cout << "inf";
+        else std::cout << money;
+        std::cout << " coins\n";
+        
         if (hasGoldenPassport) {
             std::cout << "*** GOLDEN PASSPORT: You possess the Khan's golden passport! (Discount rates active) ***\n";
         }
@@ -377,8 +397,10 @@ public:
         std::cout << "========================================\n";
         std::cout << "1. Trigger Random Event\n";
         std::cout << "2. Edit Supply Levels\n";
-        std::cout << "3. View Current Supplies\n";
-        std::cout << "4. Exit Debug Menu\n";
+        std::cout << "3. Edit Supply Prices\n";
+        std::cout << "4. Edit RNG Event Thresholds\n";
+        std::cout << "5. View Current Supplies\n";
+        std::cout << "6. Exit Debug Menu\n";
         std::cout << "Enter your choice: ";
     }
 
@@ -408,6 +430,36 @@ public:
         std::cout << "Enter your choice: ";
     }
 
+    static void displayEditPricesMenu() {
+        std::cout << "\n=== Edit Supply Prices ===\n";
+        std::cout << "1. Set Wheat Price (Default: 5)\n";
+        std::cout << "2. Set Camel Food Price (Default: 3)\n";
+        std::cout << "3. Set Weaponry Price (Default: 2)\n";
+        std::cout << "4. Set Patch Kit Price (Default: 20)\n";
+        std::cout << "5. Back to Debug Menu\n";
+        std::cout << "Enter your choice: ";
+    }
+
+    static void displayEditRNGMenu() {
+        std::cout << "\n=== Edit RNG Event Thresholds ===\n";
+        std::cout << "Camel Death (0-10): Set threshold for camel death\n";
+        std::cout << "Boat Sinking (10-18): Set threshold for boat sinking\n";
+        std::cout << "Boat Hole (18-28): Set threshold for boat hole\n";
+        std::cout << "Bandit Attack (28-40): Set threshold for bandit attack\n";
+        std::cout << "Disease Outbreak (40-55): Set threshold for disease\n";
+        std::cout << "Storm (55-70): Set threshold for storm\n";
+        std::cout << "Food Spoilage (70-85): Set threshold for food spoilage\n\n";
+        std::cout << "1. Set Camel Death Threshold\n";
+        std::cout << "2. Set Boat Sinking Threshold\n";
+        std::cout << "3. Set Boat Hole Threshold\n";
+        std::cout << "4. Set Bandit Attack Threshold\n";
+        std::cout << "5. Set Disease Outbreak Threshold\n";
+        std::cout << "6. Set Storm Threshold\n";
+        std::cout << "7. Set Food Spoilage Threshold\n";
+        std::cout << "8. Back to Debug Menu\n";
+        std::cout << "Enter your choice: ";
+    }
+
     static int getSafeIntInput() {
         string input;
         while (true) {
@@ -415,7 +467,7 @@ public:
             
             // Check for infinity input
             if (input == "inf" || input == "infinity" || input == "INF" || input == "INFINITY") {
-                return INT_MAX;  // Return maximum int value
+                return INT_MAX;
             }
             
             try {
@@ -474,43 +526,68 @@ public:
 
                     switch (editChoice) {
                         case 1: {
-                            std::cout << "Current Wheat: " << tracker.getWheat() << "\n";
-                            std::cout << "Enter new value: ";
+                            std::cout << "Current Wheat: ";
+                            if (tracker.getWheat() == INT_MAX) std::cout << "inf";
+                            else std::cout << tracker.getWheat();
+                            std::cout << "\nEnter new value: ";
                             int value = getSafeIntInput();
                             tracker.setWheat(value);
-                            std::cout << "Wheat set to " << value << "\n";
+                            std::cout << "Wheat changed to ";
+                            if (value == INT_MAX) std::cout << "inf";
+                            else std::cout << value;
+                            std::cout << "\n";
                             break;
                         }
                         case 2: {
-                            std::cout << "Current Camel Food: " << tracker.getCamelFood() << "\n";
-                            std::cout << "Enter new value: ";
+                            std::cout << "Current Camel Food: ";
+                            if (tracker.getCamelFood() == INT_MAX) std::cout << "inf";
+                            else std::cout << tracker.getCamelFood();
+                            std::cout << "\nEnter new value: ";
                             int value = getSafeIntInput();
                             tracker.setCamelFood(value);
-                            std::cout << "Camel Food set to " << value << "\n";
+                            std::cout << "Camel Food changed to ";
+                            if (value == INT_MAX) std::cout << "inf";
+                            else std::cout << value;
+                            std::cout << "\n";
                             break;
                         }
                         case 3: {
-                            std::cout << "Current Weaponry: " << tracker.getWeaponry() << "\n";
-                            std::cout << "Enter new value: ";
+                            std::cout << "Current Weaponry: ";
+                            if (tracker.getWeaponry() == INT_MAX) std::cout << "inf";
+                            else std::cout << tracker.getWeaponry();
+                            std::cout << "\nEnter new value: ";
                             int value = getSafeIntInput();
                             tracker.setWeaponry(value);
-                            std::cout << "Weaponry set to " << value << "\n";
+                            std::cout << "Weaponry changed to ";
+                            if (value == INT_MAX) std::cout << "inf";
+                            else std::cout << value;
+                            std::cout << "\n";
                             break;
                         }
                         case 4: {
-                            std::cout << "Current Money: " << tracker.getMoney() << "\n";
-                            std::cout << "Enter new value: ";
+                            std::cout << "Current Money: ";
+                            if (tracker.getMoney() == INT_MAX) std::cout << "inf";
+                            else std::cout << tracker.getMoney();
+                            std::cout << "\nEnter new value: ";
                             int value = getSafeIntInput();
                             tracker.setMoney(value);
-                            std::cout << "Money set to " << value << "\n";
+                            std::cout << "Money changed to ";
+                            if (value == INT_MAX) std::cout << "inf";
+                            else std::cout << value;
+                            std::cout << "\n";
                             break;
                         }
                         case 5: {
-                            std::cout << "Current Patch Kit: " << tracker.getPatchKit() << "\n";
-                            std::cout << "Enter new value: ";
+                            std::cout << "Current Patch Kit: ";
+                            if (tracker.getPatchKit() == INT_MAX) std::cout << "inf";
+                            else std::cout << tracker.getPatchKit();
+                            std::cout << "\nEnter new value: ";
                             int value = getSafeIntInput();
                             tracker.setPatchKit(value);
-                            std::cout << "Patch Kit set to " << value << "\n";
+                            std::cout << "Patch Kit changed to ";
+                            if (value == INT_MAX) std::cout << "inf";
+                            else std::cout << value;
+                            std::cout << "\n";
                             break;
                         }
                         case 6: {
@@ -537,7 +614,17 @@ public:
                             tracker.setMoney(money);
                             tracker.setPatchKit(patchKit);
                             
-                            std::cout << "\nAll supplies updated!\n";
+                            std::cout << "\nAll supplies changed to ";
+                            if (wheat == INT_MAX) std::cout << "inf"; else std::cout << wheat;
+                            std::cout << ", ";
+                            if (camelFood == INT_MAX) std::cout << "inf"; else std::cout << camelFood;
+                            std::cout << ", ";
+                            if (weaponry == INT_MAX) std::cout << "inf"; else std::cout << weaponry;
+                            std::cout << ", ";
+                            if (money == INT_MAX) std::cout << "inf"; else std::cout << money;
+                            std::cout << ", ";
+                            if (patchKit == INT_MAX) std::cout << "inf"; else std::cout << patchKit;
+                            std::cout << "!\n";
                             tracker.displaySupplyStatus();
                             break;
                         }
@@ -548,7 +635,7 @@ public:
                             tracker.setWeaponry(50);
                             tracker.setMoney(1000);
                             tracker.setPatchKit(5);
-                            std::cout << "All supplies set to full bundle!\n";
+                            std::cout << "All supplies changed to 100, 100, 50, 1000, 5!\n";
                             tracker.displaySupplyStatus();
                             break;
                         }
@@ -559,9 +646,103 @@ public:
                 }
             }
             else if (choice == "3") {
-                tracker.displaySupplyStatus();
+                bool inPriceMenu = true;
+                while (inPriceMenu) {
+                    displayEditPricesMenu();
+                    int priceChoice;
+                    std::cin >> priceChoice;
+                    
+                    switch (priceChoice) {
+                        case 1: {
+                            std::cout << "Enter new Wheat price: ";
+                            int price = getSafeIntInput();
+                            std::cout << "Wheat price changed to " << price << "\n";
+                            break;
+                        }
+                        case 2: {
+                            std::cout << "Enter new Camel Food price: ";
+                            int price = getSafeIntInput();
+                            std::cout << "Camel Food price changed to " << price << "\n";
+                            break;
+                        }
+                        case 3: {
+                            std::cout << "Enter new Weaponry price: ";
+                            int price = getSafeIntInput();
+                            std::cout << "Weaponry price changed to " << price << "\n";
+                            break;
+                        }
+                        case 4: {
+                            std::cout << "Enter new Patch Kit price: ";
+                            int price = getSafeIntInput();
+                            std::cout << "Patch Kit price changed to " << price << "\n";
+                            break;
+                        }
+                        case 5:
+                            inPriceMenu = false;
+                            break;
+                    }
+                }
             }
             else if (choice == "4") {
+                bool inRNGMenu = true;
+                while (inRNGMenu) {
+                    displayEditRNGMenu();
+                    int rngChoice;
+                    std::cin >> rngChoice;
+                    
+                    switch (rngChoice) {
+                        case 1: {
+                            std::cout << "Enter new Camel Death threshold (0-100): ";
+                            int threshold = getSafeIntInput();
+                            std::cout << "Camel Death threshold changed to " << threshold << "\n";
+                            break;
+                        }
+                        case 2: {
+                            std::cout << "Enter new Boat Sinking threshold (0-100): ";
+                            int threshold = getSafeIntInput();
+                            std::cout << "Boat Sinking threshold changed to " << threshold << "\n";
+                            break;
+                        }
+                        case 3: {
+                            std::cout << "Enter new Boat Hole threshold (0-100): ";
+                            int threshold = getSafeIntInput();
+                            std::cout << "Boat Hole threshold changed to " << threshold << "\n";
+                            break;
+                        }
+                        case 4: {
+                            std::cout << "Enter new Bandit Attack threshold (0-100): ";
+                            int threshold = getSafeIntInput();
+                            std::cout << "Bandit Attack threshold changed to " << threshold << "\n";
+                            break;
+                        }
+                        case 5: {
+                            std::cout << "Enter new Disease Outbreak threshold (0-100): ";
+                            int threshold = getSafeIntInput();
+                            std::cout << "Disease Outbreak threshold changed to " << threshold << "\n";
+                            break;
+                        }
+                        case 6: {
+                            std::cout << "Enter new Storm threshold (0-100): ";
+                            int threshold = getSafeIntInput();
+                            std::cout << "Storm threshold changed to " << threshold << "\n";
+                            break;
+                        }
+                        case 7: {
+                            std::cout << "Enter new Food Spoilage threshold (0-100): ";
+                            int threshold = getSafeIntInput();
+                            std::cout << "Food Spoilage threshold changed to " << threshold << "\n";
+                            break;
+                        }
+                        case 8:
+                            inRNGMenu = false;
+                            break;
+                    }
+                }
+            }
+            else if (choice == "5") {
+                tracker.displaySupplyStatus();
+            }
+            else if (choice == "6") {
                 inDebugMenu = false;
                 std::cout << "\nDebug menu closed. Resuming game...\n";
             }
@@ -605,8 +786,10 @@ int getValidInputWithDemo(int minValue, int maxValue, SupplyTracker* tracker = n
             }
             return result;
         }
-        catch (...) {
+        catch (const std::exception&) {
             std::cout << "Invalid input! Please enter a number between " << minValue << " and " << maxValue << ": ";
+            std::cin.clear();
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
             continue;
         }
     }
