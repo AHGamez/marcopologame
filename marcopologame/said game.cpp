@@ -2,6 +2,9 @@
 #include <string>
 #include <vector>
 #include <limits>
+#include <chrono>
+#include <thread>
+#include <conio.h>
 using namespace std;
 
 // Forward declarations
@@ -17,6 +20,8 @@ void displaySuppliesMenu();
 void displayStopMenu();
 void displayBoatPurchaseMenu();
 void displayCamelTradingMenu();
+void displayPrequel();
+void slowPrint(const string& text, int delayMs = 10);
 
 class Boat {
 private:
@@ -165,17 +170,19 @@ private:
     int weaponry;
     int money;
     int patchKit;
+    int morale;
     bool hasGoldenPassport;
 
 public:
     SupplyTracker(int w = 0, int cf = 0, int weap = 0, int m = 0, int pk = 0, bool passport = false)
-        : wheat(w), camelFood(cf), weaponry(weap), money(m), patchKit(pk), hasGoldenPassport(passport) {}
+        : wheat(w), camelFood(cf), weaponry(weap), money(m), patchKit(pk), morale(100), hasGoldenPassport(passport) {}
 
     int getWheat() const { return wheat; }
     int getCamelFood() const { return camelFood; }
     int getWeaponry() const { return weaponry; }
     int getMoney() const { return money; }
     int getPatchKit() const { return patchKit; }
+    int getMorale() const { return morale; }
     bool getGoldenPassport() const { return hasGoldenPassport; }
 
     void setGoldenPassport(bool value) { hasGoldenPassport = value; }
@@ -184,6 +191,25 @@ public:
     void setWeaponry(int w) { weaponry = w; }
     void setMoney(int m) { money = m; }
     void setPatchKit(int pk) { patchKit = pk; }
+    void setMorale(int mr) { morale = (mr > 100) ? 100 : (mr < 0) ? 0 : mr; }
+
+    void decreaseMorale(int amount) {
+        morale -= amount;
+        if (morale < 0) morale = 0;
+    }
+
+    void restoreMorale(int amount) {
+        morale += amount;
+        if (morale > 100) morale = 100;
+    }
+
+    string getMoraleStatus() const {
+        if (morale >= 80) return "Excellent";
+        else if (morale >= 60) return "Good";
+        else if (morale >= 40) return "Fair";
+        else if (morale >= 20) return "Low";
+        else return "Critical";
+    }
 
     bool buySupplies(int wAmount, int cfAmount, int wpAmount, int mAmount) {
         if (wheat >= wAmount && camelFood >= cfAmount && weaponry >= wpAmount && money >= mAmount) {
@@ -231,6 +257,8 @@ public:
         else std::cout << money;
         std::cout << " coins\n";
         
+        std::cout << "Morale: " << morale << "/100 (" << getMoraleStatus() << ")\n";
+        
         if (hasGoldenPassport) {
             std::cout << "*** GOLDEN PASSPORT: You possess the Khan's golden passport! (Discount rates active) ***\n";
         }
@@ -238,6 +266,10 @@ public:
 
     bool isCriticallyLow() const {
         return (wheat < 5) || (money < 20);
+    }
+
+    bool isExhausted() const {
+        return morale <= 10;
     }
 };
 
@@ -819,6 +851,103 @@ int getValidInput(int minValue, int maxValue) {
     }
 }
 
+// Optimized slow text printing function - faster with skip support
+void slowPrint(const string& text, int delayMs) {
+    for (size_t i = 0; i < text.length(); ++i) {
+        std::cout << text[i] << std::flush;
+        
+        // Check if key was pressed (non-blocking)
+        if (_kbhit()) {
+            int key = _getch();
+            if (key == 13) {  // Enter key
+                // Print the rest of the text instantly
+                std::cout << text.substr(i + 1);
+                return;
+            }
+        }
+        
+        if (delayMs > 0) {
+            std::this_thread::sleep_for(std::chrono::milliseconds(delayMs));
+        }
+    }
+}
+
+void displayPrequel() {
+    std::cout << "\n";
+    std::cout << "================================================================================\n";
+    std::cout << "                         MARCO POLO'S JOURNEY BEGINS\n";
+    std::cout << "                              THE PRELUDE\n";
+    std::cout << "================================================================================\n";
+    std::cout << "\n";
+
+    slowPrint("VENICE, 1271\n");
+    slowPrint("The bustling port city of Venice thrums with the energy of merchants, sailors, and\n");
+    slowPrint("traders. The salty sea air fills your lungs as you stand at the dock, watching ships\n");
+    slowPrint("arrive and depart to distant lands. Your father, Nicolo Polo, has called you to\n");
+    slowPrint("meet him and your Uncle Maffeo at the harbor.\n\n");
+
+    slowPrint("NICOLO (Your Father):\n");
+    slowPrint("\"Marco! There you are. We've been waiting for you. Listen closely, my son.\n");
+    slowPrint("Your uncle and I have just returned from the East. We've traveled roads that few\n");
+    slowPrint("Venetians have ever dared to venture upon. The riches we saw... magnificent!\"\n\n");
+
+    slowPrint("MAFFEO (Your Uncle):\n");
+    slowPrint("\"Yes, Marco. We reached the court of the great Kublai Khan himself! The Khan\n");
+    slowPrint("has granted us permission to return with tribute and a young man of intelligence.\n");
+    slowPrint("Your father has chosen you for this honor.\"\n\n");
+
+    slowPrint("You stand stunned, unable to speak. The Kublai Khan? The legendary ruler of the\n");
+    slowPrint("Mongol Empire? Your father places a hand on your shoulder.\n\n");
+
+    slowPrint("NICOLO:\n");
+    slowPrint("\"Marco, you are seventeen now. Too old to hide behind merchant stalls in Venice.\n");
+    slowPrint("Too young to waste your potential on the same mundane routes that every trader\n");
+    slowPrint("knows by heart. The Khan has heard of our family, and he believes you have the\n");
+    slowPrint("intelligence and cunning to serve him well.\"\n\n");
+
+    slowPrint("MAFFEO:\n");
+    slowPrint("\"The journey will not be easy, nephew. Deserts that stretch for weeks. Mountains\n");
+    slowPrint("so high the air itself becomes thin. Bandits, storms, and dangers we cannot\n");
+    slowPrint("even name. But the reward—service to the most powerful ruler in the world!\n");
+    slowPrint("And knowledge of lands our civilization has barely heard whispers about.\"\n\n");
+
+    slowPrint("Your heart pounds in your chest. Fear and excitement battle within you.\n\n");
+
+    slowPrint("NICOLO:\n");
+    slowPrint("\"We depart tomorrow at dawn. You will gather supplies today. Choose your boat\n");
+    slowPrint("and camel carefully—your life may depend on these choices. We will provide you\n");
+    slowPrint("with enough money and supplies to sustain us through the early stages of our\n");
+    slowPrint("journey, but you must manage them wisely.\"\n\n");
+
+    slowPrint("MAFFEO:\n");
+    slowPrint("\"The path to Cathay is long, Marco. Over 5,000 miles of unknown territory.\n");
+    slowPrint("You will face trials that will test your character, your wisdom, and your will.\n");
+    slowPrint("But if you succeed, you will have the ear of the Khan himself. You will see\n");
+    slowPrint("wonders beyond imagination.\"\n\n");
+
+    slowPrint("Your uncle grips your arm firmly.\n\n");
+
+    slowPrint("MAFFEO:\n");
+    slowPrint("\"Are you ready, Marco? Ready to become a man of the world?\"\n\n");
+
+    slowPrint("You take a deep breath and nod, your resolve hardening. This is your chance.\n");
+    slowPrint("This is destiny.\n\n");
+
+    slowPrint("NICOLO:\n");
+    slowPrint("\"Excellent. Tomorrow, we embark on a journey that will change everything.\n");
+    slowPrint("Remember, Marco—fortune favors the bold, but it protects the wise.\"\n\n");
+
+    std::cout << "================================================================================\n";
+    slowPrint("The sun sets over Venice as you prepare for the greatest adventure of your life.\n");
+    slowPrint("Your journey to the court of Kublai Khan is about to begin...\n");
+    std::cout << "================================================================================\n";
+    std::cout << "\n\n";
+
+    std::cout << "Press Enter to continue...\n";
+    std::cin.get();
+    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+}
+
 vector<JourneyStop> initializeJourneyStops() {
     vector<JourneyStop> stops;
     stops.push_back(JourneyStop("Venice", 1271, 
@@ -1066,7 +1195,10 @@ public:
 };
 
 int main() {
-    std::cout << "Welcome to My Game - Marco Polo's Journey to China and Back!\n\n";
+    // Display prequel sequence
+    displayPrequel();
+
+    std::cout << "Welcome to Marco Polo's Journey to China and Back!\n\n";
 
     // Boat selection
     Boat selectedBoat = Boat();
@@ -1241,6 +1373,13 @@ int main() {
         bool atStop = true;
         while (atStop) {
             displayStopMenu();
+            
+            // Show exhaustion warning
+            if (tracker.isExhausted()) {
+                std::cout << "\n*** WARNING: Your morale is CRITICALLY LOW! You are EXHAUSTED! ***\n";
+                std::cout << "You MUST rest immediately or face serious consequences!\n";
+            }
+            
             std::cout << "Enter your choice: ";
             int action = getValidInputWithDemo(1, 4, &tracker, &selectedCamel, &selectedBoat, 4);
 
@@ -1253,7 +1392,7 @@ int main() {
 
                     // Apply discount if has golden passport
                     if (tracker.getGoldenPassport()) {
-                        wheatPrice = (wheatPrice * 3) / 4;  // 25% discount
+                        wheatPrice = (wheatPrice * 3) / 4;
                         camelFoodPrice = (camelFoodPrice * 3) / 4;
                         weaponryPrice = (weaponryPrice * 3) / 4;
                         patchKitPrice = 15;
@@ -1267,7 +1406,7 @@ int main() {
                     
                     // Advanced weaponry in Persia
                     if (currentStop.getName() == "Persia") {
-                        std::cout << "4. Buy Advanced Weaponry (50 coins) - Stronger defense!\n";
+                        std::cout << "4. Browse Advanced Weaponry (swords, bows, armor)\n";
                         std::cout << "5. Buy Patch Kit (" << patchKitPrice << " coins) - Repairs boat damage\n";
                         std::cout << "6. Skip purchases\n";
                     } else {
@@ -1286,23 +1425,50 @@ int main() {
                     if (buyChoice == 1) {
                         tracker.addSupplies(wheatPrice, 0, 0, 0);
                         std::cout << "Purchased Wheat!\n";
+                        tracker.decreaseMorale(2);  // Shopping slightly tiring
                     } else if (buyChoice == 2) {
                         tracker.addSupplies(0, camelFoodPrice, 0, 0);
                         std::cout << "Purchased Camel Food!\n";
+                        tracker.decreaseMorale(2);
                     } else if (buyChoice == 3) {
                         tracker.addSupplies(0, 0, weaponryPrice, 0);
                         std::cout << "Purchased Weaponry!\n";
+                        tracker.decreaseMorale(2);
                     } else if (currentStop.getName() == "Persia" && buyChoice == 4) {
-                        if (tracker.getMoney() >= 50) {
-                            tracker.addSupplies(0, 0, 30, -50);
-                            std::cout << "Purchased Advanced Weaponry! (+30 weaponry damage)\n";
-                        } else {
-                            std::cout << "Insufficient funds! You need 50 coins.\n";
+                        AdvancedWeaponry::displayAdvancedWeaponryMenu();
+                        std::cout << "Enter your choice: ";
+                        int weaponChoice = getValidInputWithDemo(1, 5, &tracker, &selectedCamel, &selectedBoat, 3);
+
+                        if (weaponChoice != 5) {
+                            AdvancedWeaponry::Weapon selectedWeapon = AdvancedWeaponry::getWeaponChoice(weaponChoice);
+                            int weaponCost = AdvancedWeaponry::getWeaponCost(weaponChoice);
+
+                            if (tracker.getGoldenPassport()) {
+                                weaponCost = (weaponCost * 3) / 4;
+                                std::cout << "*** GOLDEN PASSPORT DISCOUNT APPLIED! ***\n";
+                            }
+
+                            if (tracker.getMoney() >= weaponCost) {
+                                tracker.addSupplies(0, 0, selectedWeapon.damageBonus, -weaponCost);
+                                std::cout << "\n*** PURCHASED: " << selectedWeapon.name << " ***\n";
+                                std::cout << "Description: " << selectedWeapon.description << "\n";
+                                if (weaponChoice == 4) {
+                                    std::cout << "Combat Bonuses: +20 Melee, +25 Ranged, +15 Defense\n";
+                                } else {
+                                    std::cout << "Bonus: +" << selectedWeapon.damageBonus << " damage\n";
+                                }
+                                std::cout << "Cost: " << weaponCost << " coins\n";
+                                std::cout << "Money remaining: " << tracker.getMoney() << " coins\n";
+                                tracker.decreaseMorale(3);
+                            } else {
+                                std::cout << "Insufficient funds! You need " << weaponCost << " coins.\n";
+                            }
                         }
                     } else if ((currentStop.getName() == "Persia" && buyChoice == 5) || (currentStop.getName() != "Persia" && buyChoice == 4)) {
                         if (tracker.getMoney() >= patchKitPrice) {
                             tracker.addSupplies(0, 0, 0, -patchKitPrice, 1);
                             std::cout << "Purchased Patch Kit!\n";
+                            tracker.decreaseMorale(2);
                         } else {
                             std::cout << "Insufficient funds! You need " << patchKitPrice << " coins.\n";
                         }
@@ -1333,6 +1499,7 @@ int main() {
                             std::cout << "Your new camel:\n";
                             selectedCamel.displayInfo();
                             std::cout << "Money remaining: " << tracker.getMoney() << " coins\n";
+                            tracker.decreaseMorale(5);  // Trading is demanding
                         } else {
                             std::cout << "Insufficient funds! You need " << tradeCost << " coins.\n";
                         }
@@ -1345,9 +1512,20 @@ int main() {
                         std::cout << "\n*** WARNING: Your supplies are critically low! ***\n";
                     }
                     break;
-                case 4:
-                    atStop = false;
+                case 4: {
+                    // Rest option
+                    if (tracker.getMorale() < 100) {
+                        std::cout << "\nYou take time to rest and recover...\n";
+                        tracker.restoreMorale(40);
+                        std::cout << "You feel refreshed! Morale restored to " << tracker.getMorale() << "/100\n";
+                        tracker.decreaseMorale(8);  // But continuing journey costs morale
+                        atStop = false;
+                    } else {
+                        std::cout << "\nYou are already well-rested. Continue your journey.\n";
+                        atStop = false;
+                    }
                     break;
+                }
             }
         }
 
@@ -1365,6 +1543,10 @@ int main() {
             
             tracker.addSupplies(-wheatUsed, -camelFoodUsed, 0, 0);
             
+            // Morale decreases with travel (exhaustion from journey)
+            int moraleLoss = 10 + (i / 2);  // Increases as journey goes on
+            tracker.decreaseMorale(moraleLoss);
+            
             std::cout << "\n========== SUPPLY CONSUMPTION REPORT ==========\n";
             std::cout << "--- BEFORE TRAVEL ---\n";
             std::cout << "  Wheat: " << wheatBefore << " units\n";
@@ -1374,6 +1556,7 @@ int main() {
             std::cout << "\n--- CONSUMED DURING TRAVEL ---\n";
             std::cout << "  Wheat consumed: " << wheatUsed << " units\n";
             std::cout << "  Camel Food consumed: " << camelFoodUsed << " units\n";
+            std::cout << "  Morale lost: " << moraleLoss << " points (Travel exhaustion)\n";
             
             std::cout << "\n--- AFTER TRAVEL ---\n";
             std::cout << "  Wheat: " << tracker.getWheat() << " units";
@@ -1383,6 +1566,7 @@ int main() {
             if (tracker.getCamelFood() < 0) std::cout << " (DEFICIT!)";
             std::cout << "\n";
             std::cout << "  Money: " << tracker.getMoney() << " coins\n";
+            std::cout << "  Morale: " << tracker.getMorale() << "/100 (" << tracker.getMoraleStatus() << ")\n";
             std::cout << "=============================================\n";
             
             // Check if supplies are depleted
@@ -1392,11 +1576,24 @@ int main() {
                 std::cout << "GAME OVER\n";
                 break;
             }
+
+            // Check for exhaustion
+            if (tracker.isExhausted()) {
+                std::cout << "\n*** CRITICAL: You are completely exhausted! ***\n";
+                std::cout << "Without rest, you cannot continue...\n";
+                std::cout << "Your journey has ended.\n";
+                std::cout << "GAME OVER\n";
+                break;
+            }
             
             tracker.displaySupplyStatus();
             
             if (tracker.isCriticallyLow()) {
                 std::cout << "\n*** WARNING: Supplies are running low! Stock up at the next stop! ***\n";
+            }
+
+            if (tracker.getMorale() < 30) {
+                std::cout << "\n*** WARNING: Your morale is dangerously low! Consider resting at the next stop! ***\n";
             }
 
             // Generate random event during travel
