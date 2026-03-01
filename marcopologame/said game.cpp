@@ -5,6 +5,8 @@
 #include <chrono>
 #include <thread>
 #include <conio.h>
+#include <cstdlib>
+#include <ctime>
 using namespace std;
 
 // Forward declarations
@@ -22,6 +24,7 @@ void displayBoatPurchaseMenu();
 void displayCamelTradingMenu();
 void displayPrequel();
 void slowPrint(const string& text, int delayMs = 10);
+void playMiningMinigame(SupplyTracker& tracker);
 
 class Boat {
 private:
@@ -889,7 +892,7 @@ void displayPrequel() {
     slowPrint("NICOLO (Your Father):\n");
     slowPrint("\"Marco! There you are. We've been waiting for you. Listen closely, my son.\n");
     slowPrint("Your uncle and I have just returned from the East. We've traveled roads that few\n");
-    slowPrint("Venetians have ever dared to venture upon. The riches we saw... magnificent!\"\n\n");
+    slowPrint("Venetians have ever dared to venture upon. The riches we saw... magnificent!\"\n\n());
 
     slowPrint("MAFFEO (Your Uncle):\n");
     slowPrint("\"Yes, Marco. We reached the court of the great Kublai Khan himself! The Khan\n");
@@ -1194,6 +1197,213 @@ public:
     }
 };
 
+// Mining Minigame Class
+class MiningMinigame {
+private:
+    static const int GRID_WIDTH = 20;
+    static const int GRID_HEIGHT = 10;
+    int playerX, playerY;
+    int guardX, guardY;
+    int resourcesCollected;
+    int totalResources;
+    bool caught;
+    vector<vector<char>> grid;
+    
+public:
+    MiningMinigame() : playerX(1), playerY(1), guardX(GRID_WIDTH - 2), guardY(GRID_HEIGHT - 2), 
+                       resourcesCollected(0), totalResources(5), caught(false) {
+        initializeGrid();
+    }
+    
+    void initializeGrid() {
+        grid.assign(GRID_HEIGHT, vector<char>(GRID_WIDTH, '.'));
+        
+        // Add borders
+        for (int x = 0; x < GRID_WIDTH; ++x) {
+            grid[0][x] = '#';
+            grid[GRID_HEIGHT - 1][x] = '#';
+        }
+        for (int y = 0; y < GRID_HEIGHT; ++y) {
+            grid[y][0] = '#';
+            grid[y][GRID_WIDTH - 1] = '#';
+        }
+        
+        // Place resources randomly
+        srand(static_cast<unsigned>(time(nullptr)));
+        int resourcesPlaced = 0;
+        while (resourcesPlaced < totalResources) {
+            int x = 2 + rand() % (GRID_WIDTH - 4);
+            int y = 2 + rand() % (GRID_HEIGHT - 4);
+            if (grid[y][x] == '.') {
+                grid[y][x] = '*';
+                resourcesPlaced++;
+            }
+        }
+        
+        // Set initial positions
+        grid[playerY][playerX] = 'P';
+        grid[guardY][guardX] = 'G';
+    }
+    
+    void displayGrid() const {
+        system("cls");
+        std::cout << "\n========== ILLEGAL MINING OPERATION ==========\n";
+        std::cout << "Avoid the guard (G) and collect all resources (*)\n";
+        std::cout << "Controls: W=Up, S=Down, A=Left, D=Right, Q=Quit\n";
+        std::cout << "Resources: " << resourcesCollected << "/" << totalResources << "\n";
+        std::cout << "============================================\n\n";
+        
+        for (int y = 0; y < GRID_HEIGHT; ++y) {
+            for (int x = 0; x < GRID_WIDTH; ++x) {
+                std::cout << grid[y][x];
+            }
+            std::cout << "\n";
+        }
+        std::cout << "\nP = You, G = Guard, * = Resources, # = Wall\n";
+    }
+    
+    void movePlayer(char direction) {
+        grid[playerY][playerX] = '.';
+        
+        int newX = playerX, newY = playerY;
+        
+        if (direction == 'w' || direction == 'W') newY--;
+        else if (direction == 's' || direction == 'S') newY++;
+        else if (direction == 'a' || direction == 'A') newX--;
+        else if (direction == 'd' || direction == 'D') newX++;
+        
+        // Check boundaries and walls
+        if (grid[newY][newX] != '#') {
+            // Check if collecting resource
+            if (grid[newY][newX] == '*') {
+                resourcesCollected++;
+            }
+            
+            playerX = newX;
+            playerY = newY;
+        }
+        
+        grid[playerY][playerX] = 'P';
+    }
+    
+    void moveGuard() {
+        grid[guardY][guardX] = '.';
+        
+        // Simple AI: move towards player
+        int dx = (playerX > guardX) ? 1 : (playerX < guardX) ? -1 : 0;
+        int dy = (playerY > guardY) ? 1 : (playerY < guardY) ? -1 : 0;
+        
+        int newX = guardX + dx;
+        int newY = guardY + dy;
+        
+        // Check if can move
+        if (grid[newY][newX] != '#') {
+            guardX = newX;
+            guardY = newY;
+        }
+        
+        grid[guardY][guardX] = 'G';
+    }
+    
+    bool checkCaught() const {
+        return (playerX == guardX && playerY == guardY);
+    }
+    
+    bool allResourcesCollected() const {
+        return resourcesCollected >= totalResources;
+    }
+    
+    int getResourcesCollected() const {
+        return resourcesCollected;
+    }
+    
+    void play() {
+        char input;
+        int moveCounter = 0;
+        
+        while (!caught && !allResourcesCollected()) {
+            displayGrid();
+            
+            if (_kbhit()) {
+                input = _getch();
+                if (input == 'q' || input == 'Q') {
+                    std::cout << "\nYou abandoned the mining operation and fled!\n";
+                    resourcesCollected = 0;
+                    return;
+                }
+                movePlayer(input);
+                movePlayer(input);  // Double movement for faster speed
+            }
+            
+            // Guard moves every player move (faster guard)
+            moveGuard();
+            
+            // Check if caught
+            if (checkCaught()) {
+                caught = true;
+                displayGrid();
+                std::cout << "\n*** CAUGHT BY THE GUARD! ***\n";
+                std::cout << "You were apprehended! You died in prison!\n";
+                std::cout << "GAME OVER - MINING FAILURE\n";
+                resourcesCollected = 0;
+                std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+                return;
+            }
+            
+            // Check if all resources collected
+            if (allResourcesCollected()) {
+                displayGrid();
+                std::cout << "\n*** SUCCESS! ***\n";
+                std::cout << "You collected all resources and escaped with your life!\n";
+                std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+                return;
+            }
+            
+            std::this_thread::sleep_for(std::chrono::milliseconds(100));  // Faster refresh
+        }
+    }
+};
+
+void playMiningMinigame(SupplyTracker& tracker) {
+    std::cout << "\n========== ILLEGAL MINING MINIGAME ==========\n";
+    std::cout << "DANGER: If caught, you will be executed!\n";
+    std::cout << "You discover an opportunity to mine precious stones!\n";
+    std::cout << "If you succeed, you'll gain resources and money.\n";
+    std::cout << "But if you're caught, you DIE and the journey ends!\n";
+    std::cout << "\nAttempt the mining operation? (y/n): ";
+    
+    char response;
+    std::cin >> response;
+    
+    if (response != 'y' && response != 'Y') {
+        std::cout << "You decide it's too risky and move on.\n";
+        return;
+    }
+    
+    MiningMinigame game;
+    game.play();
+    
+    int resourcesGained = game.getResourcesCollected();
+    
+    if (resourcesGained > 0) {
+        int wheatGain = resourcesGained * 15;
+        int moneyGain = resourcesGained * 100;
+        
+        tracker.addSupplies(wheatGain, 0, 0, moneyGain);
+        
+        std::cout << "\n*** MINING REWARDS ***\n";
+        std::cout << "Gained: " << wheatGain << " wheat units\n";
+        std::cout << "Gained: " << moneyGain << " coins\n";
+        std::cout << "Morale boost from success!\n";
+        tracker.restoreMorale(15);
+    } else {
+        std::cout << "\nYour mining operation failed!\n";
+        std::cout << "CRITICAL: You were executed by the authorities!\n";
+        std::cout << "GAME OVER - YOUR JOURNEY ENDS HERE\n";
+        tracker.setWheat(-1);  // Trigger game over
+    }
+}
+
 int main() {
     // Display prequel sequence
     displayPrequel();
@@ -1207,7 +1417,7 @@ int main() {
     while (!hasBoat) {
         displayBoatMenu();
         std::cout << "Enter your choice: ";
-        int boatChoice = getValidInputWithDemo(1, 6, nullptr, nullptr, nullptr, 1);
+        int boatChoice = getValidInputWithDemo(1, 6, nullptr, nullptr, nullptr, 1)
 
         std::cout << "\n";
         selectedBoat = createBoatChoice(boatChoice);
@@ -1425,7 +1635,7 @@ int main() {
                     if (buyChoice == 1) {
                         tracker.addSupplies(wheatPrice, 0, 0, 0);
                         std::cout << "Purchased Wheat!\n";
-                        tracker.decreaseMorale(2);  // Shopping slightly tiring
+                        tracker.decreaseMorale(2);
                     } else if (buyChoice == 2) {
                         tracker.addSupplies(0, camelFoodPrice, 0, 0);
                         std::cout << "Purchased Camel Food!\n";
@@ -1499,7 +1709,7 @@ int main() {
                             std::cout << "Your new camel:\n";
                             selectedCamel.displayInfo();
                             std::cout << "Money remaining: " << tracker.getMoney() << " coins\n";
-                            tracker.decreaseMorale(5);  // Trading is demanding
+                            tracker.decreaseMorale(5);
                         } else {
                             std::cout << "Insufficient funds! You need " << tradeCost << " coins.\n";
                         }
@@ -1513,12 +1723,19 @@ int main() {
                     }
                     break;
                 case 4: {
+                    // MINING MINIGAME OPPORTUNITY AT PERSIA
+                    if (currentStop.getName() == "Persia") {
+                        std::cout << "\nBefore you leave Persia, you notice some illegal mining sites...\n";
+                        playMiningMinigame(tracker);
+                        tracker.displaySupplyStatus();
+                    }
+                    
                     // Rest option
                     if (tracker.getMorale() < 100) {
                         std::cout << "\nYou take time to rest and recover...\n";
                         tracker.restoreMorale(40);
                         std::cout << "You feel refreshed! Morale restored to " << tracker.getMorale() << "/100\n";
-                        tracker.decreaseMorale(8);  // But continuing journey costs morale
+                        tracker.decreaseMorale(8);
                         atStop = false;
                     } else {
                         std::cout << "\nYou are already well-rested. Continue your journey.\n";
@@ -1544,7 +1761,7 @@ int main() {
             tracker.addSupplies(-wheatUsed, -camelFoodUsed, 0, 0);
             
             // Morale decreases with travel (exhaustion from journey)
-            int moraleLoss = 10 + (i / 2);  // Increases as journey goes on
+            int moraleLoss = 10 + (i / 2);
             tracker.decreaseMorale(moraleLoss);
             
             std::cout << "\n========== SUPPLY CONSUMPTION REPORT ==========\n";
