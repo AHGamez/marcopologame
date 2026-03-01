@@ -40,8 +40,9 @@ public:
     Boat() : type("Junk"), sails(2), age(12), weight(500), storageCapacity(3), supplies("None") {}
 
     // Parameterized constructor
-    Boat(const string& boatType, int numSails, int boatAge, int boatWeight, int storage, const string& boatSupplies) 
-        : type(boatType), sails(numSails), age(boatAge), weight(boatWeight), storageCapacity(storage), supplies(boatSupplies) {}
+    Boat(const string& boatType, int numSails, int boatAge, int boatWeight, int storage, const string& boatSupplies)
+        : type(boatType), sails(numSails), age(boatAge), weight(boatWeight), storageCapacity(storage), supplies(boatSupplies) {
+    }
 
     string getType() const { return type; }
     int getSails() const { return sails; }
@@ -65,7 +66,7 @@ public:
         if (age > 20) return "Too Old";
         else return "Good Condition";
     }
-        
+
     void displayInfo() const {
         std::cout << "Type: " << type << "\n";
         std::cout << "Sails: " << sails << "\n";
@@ -89,8 +90,9 @@ private:
 public:
     Camel() : species("Bactrian"), humps(2), age(12), weight(700), storageCapacity(100), supplies("None") {}
 
-    Camel(const string& camelSpecies, int numHumps, int camelAge, int camelWeight, int storage, const string& camelSupplies) 
-        : species(camelSpecies), humps(numHumps), age(camelAge), weight(camelWeight), storageCapacity(storage), supplies(camelSupplies) {}
+    Camel(const string& camelSpecies, int numHumps, int camelAge, int camelWeight, int storage, const string& camelSupplies)
+        : species(camelSpecies), humps(numHumps), age(camelAge), weight(camelWeight), storageCapacity(storage), supplies(camelSupplies) {
+    }
 
     string getSpecies() const { return species; }
     int getHumps() const { return humps; }
@@ -140,10 +142,11 @@ private:
     string discovery;
 
 public:
-    JourneyStop(const string& stopName, int stopYear, const string& stopDesc, 
-                int wCost, int cfCost, int wpCost, const string& stopDiscovery = "")
-        : name(stopName), year(stopYear), description(stopDesc), 
-          wheatCost(wCost), camelFoodCost(cfCost), weaponryCost(wpCost), discovery(stopDiscovery) {}
+    JourneyStop(const string& stopName, int stopYear, const string& stopDesc,
+        int wCost, int cfCost, int wpCost, const string& stopDiscovery = "")
+        : name(stopName), year(stopYear), description(stopDesc),
+        wheatCost(wCost), camelFoodCost(cfCost), weaponryCost(wpCost), discovery(stopDiscovery) {
+    }
 
     string getName() const { return name; }
     int getYear() const { return year; }
@@ -174,11 +177,13 @@ private:
     int money;
     int patchKit;
     int morale;
+    int rubies;
     bool hasGoldenPassport;
 
 public:
     SupplyTracker(int w = 0, int cf = 0, int weap = 0, int m = 0, int pk = 0, bool passport = false)
-        : wheat(w), camelFood(cf), weaponry(weap), money(m), patchKit(pk), morale(100), hasGoldenPassport(passport) {}
+        : wheat(w), camelFood(cf), weaponry(weap), money(m), patchKit(pk), morale(100), rubies(0), hasGoldenPassport(passport) {
+    }
 
     int getWheat() const { return wheat; }
     int getCamelFood() const { return camelFood; }
@@ -186,6 +191,7 @@ public:
     int getMoney() const { return money; }
     int getPatchKit() const { return patchKit; }
     int getMorale() const { return morale; }
+    int getRubies() const { return rubies; }
     bool getGoldenPassport() const { return hasGoldenPassport; }
 
     void setGoldenPassport(bool value) { hasGoldenPassport = value; }
@@ -194,6 +200,7 @@ public:
     void setWeaponry(int w) { weaponry = w; }
     void setMoney(int m) { money = m; }
     void setPatchKit(int pk) { patchKit = pk; }
+    void setRubies(int r) { rubies = r; }
     void setMorale(int mr) { morale = (mr > 100) ? 100 : (mr < 0) ? 0 : mr; }
 
     void decreaseMorale(int amount) {
@@ -233,35 +240,41 @@ public:
         patchKit += pkAmount;
     }
 
+    void addRubies(int rubieCount) {
+        rubies += rubieCount;
+    }
+
     void displaySupplyStatus() const {
         std::cout << "\n=== Current Supply Status ===\n";
         std::cout << "Wheat: ";
         if (wheat == INT_MAX) std::cout << "inf";
         else std::cout << wheat;
         std::cout << " units\n";
-        
+
         std::cout << "Camel Food: ";
         if (camelFood == INT_MAX) std::cout << "inf";
         else std::cout << camelFood;
         std::cout << " units\n";
-        
+
         std::cout << "Weaponry: ";
         if (weaponry == INT_MAX) std::cout << "inf";
         else std::cout << weaponry;
         std::cout << " units\n";
-        
+
         std::cout << "Patch Kit: ";
         if (patchKit == INT_MAX) std::cout << "inf";
         else std::cout << patchKit;
         std::cout << " unit(s)\n";
-        
+
+        std::cout << "Rubies: " << rubies << " gem(s)\n";
+
         std::cout << "Money: ";
         if (money == INT_MAX) std::cout << "inf";
         else std::cout << money;
         std::cout << " coins\n";
-        
+
         std::cout << "Morale: " << morale << "/100 (" << getMoraleStatus() << ")\n";
-        
+
         if (hasGoldenPassport) {
             std::cout << "*** GOLDEN PASSPORT: You possess the Khan's golden passport! (Discount rates active) ***\n";
         }
@@ -292,11 +305,11 @@ public:
 
     static EventType generateRandomEvent(int legNumber) {
         int rand_val = rand() % 100;
-        
+
         // Increasing danger as journey progresses
         if (legNumber < 3) rand_val += 20;
         if (legNumber > 9) rand_val -= 20;
-        
+
         if (rand_val < 10) return CAMEL_DEATH;
         if (rand_val < 18) return BOAT_SINKING;
         if (rand_val < 28) return BOAT_HOLE;
@@ -309,102 +322,104 @@ public:
 
     static string getEventDescription(EventType event) {
         switch (event) {
-            case CAMEL_DEATH:
-                return "Your camel has fallen ill and died from the harsh desert conditions!";
-            case BOAT_SINKING:
-                return "Your boat has sprung a leak! You must make emergency repairs!";
-            case BOAT_HOLE:
-                return "Your boat has developed a hole in the hull!";
-            case BANDIT_ATTACK:
-                return "Bandits have attacked your caravan! You must defend your supplies!";
-            case DISEASE_OUTBREAK:
-                return "Illness has spread through your party! Medical supplies are needed!";
-            case STORM:
-                return "A terrible storm has struck! You must take shelter and wait it out!";
-            case FOOD_SPOILAGE:
-                return "Much of your food has spoiled in the heat and humidity!";
-            default:
-                return "No incidents occurred.";
+        case CAMEL_DEATH:
+            return "Your camel has fallen ill and died from the harsh desert conditions!";
+        case BOAT_SINKING:
+            return "Your boat has sprung a leak! You must make emergency repairs!";
+        case BOAT_HOLE:
+            return "Your boat has developed a hole in the hull!";
+        case BANDIT_ATTACK:
+            return "Bandits have attacked your caravan! You must defend your supplies!";
+        case DISEASE_OUTBREAK:
+            return "Illness has spread through your party! Medical supplies are needed!";
+        case STORM:
+            return "A terrible storm has struck! You must take shelter and wait it out!";
+        case FOOD_SPOILAGE:
+            return "Much of your food has spoiled in the heat and humidity!";
+        default:
+            return "No incidents occurred.";
         }
     }
 
     static void handleEvent(EventType event, SupplyTracker& tracker, Camel& camel, Boat& boat, bool& journeyEnded) {
         int wheatLoss = 0;
         int foodLoss = 0;
-        
+
         switch (event) {
-            case CAMEL_DEATH:
-                std::cout << "\n*** RANDOM EVENT: CAMEL DEATH ***\n";
-                std::cout << getEventDescription(event) << "\n";
-                camel.setAge(999);
-                std::cout << "You lose your camel and must continue on foot!\n";
-                std::cout << "Your travel speed decreases significantly.\n";
-                break;
+        case CAMEL_DEATH:
+            std::cout << "\n*** RANDOM EVENT: CAMEL DEATH ***\n";
+            std::cout << getEventDescription(event) << "\n";
+            camel.setAge(999);
+            std::cout << "You lose your camel and must continue on foot!\n";
+            std::cout << "Your travel speed decreases significantly.\n";
+            break;
 
-            case BOAT_SINKING:
-                std::cout << "\n*** RANDOM EVENT: BOAT DAMAGE ***\n";
-                std::cout << getEventDescription(event) << "\n";
-                tracker.addSupplies(-20, -15, -5, -50);
-                std::cout << "Supplies lost: 20 wheat, 15 camel food, 5 weaponry, 50 coins\n";
-                break;
+        case BOAT_SINKING:
+            std::cout << "\n*** RANDOM EVENT: BOAT DAMAGE ***\n";
+            std::cout << getEventDescription(event) << "\n";
+            tracker.addSupplies(-20, -15, -5, -50);
+            std::cout << "Supplies lost: 20 wheat, 15 camel food, 5 weaponry, 50 coins\n";
+            break;
 
-            case BOAT_HOLE:
-                std::cout << "\n*** RANDOM EVENT: BOAT HOLE ***\n";
-                std::cout << getEventDescription(event) << "\n";
-                if (tracker.getPatchKit() > 0) {
-                    std::cout << "You use a patch kit to repair the hole!\n";
-                    tracker.addSupplies(0, 0, 0, 0, -1);
-                    std::cout << "Patch kit used! You lose: 1 patch kit\n";
-                } else {
-                    std::cout << "You have no patch kit! Water seeps in constantly.\n";
-                    tracker.addSupplies(-10, -5, 0, -25);
-                    std::cout << "You lose: 10 wheat, 5 camel food, 25 coins (water damage)\n";
-                    std::cout << "Consider buying a patch kit at the next stop!\n";
-                }
-                break;
+        case BOAT_HOLE:
+            std::cout << "\n*** RANDOM EVENT: BOAT HOLE ***\n";
+            std::cout << getEventDescription(event) << "\n";
+            if (tracker.getPatchKit() > 0) {
+                std::cout << "You use a patch kit to repair the hole!\n";
+                tracker.addSupplies(0, 0, 0, 0, -1);
+                std::cout << "Patch kit used! You lose: 1 patch kit\n";
+            }
+            else {
+                std::cout << "You have no patch kit! Water seeps in constantly.\n";
+                tracker.addSupplies(-10, -5, 0, -25);
+                std::cout << "You lose: 10 wheat, 5 camel food, 25 coins (water damage)\n";
+                std::cout << "Consider buying a patch kit at the next stop!\n";
+            }
+            break;
 
-            case BANDIT_ATTACK:
-                std::cout << "\n*** RANDOM EVENT: BANDIT ATTACK ***\n";
-                std::cout << getEventDescription(event) << "\n";
-                if (tracker.getWeaponry() > 0) {
-                    std::cout << "You defend yourself with your weapons!\n";
-                    tracker.addSupplies(0, 0, -5, -100);
-                    std::cout << "You lose: 5 weaponry, 100 coins\n";
-                } else {
-                    std::cout << "You have no weapons to defend yourself!\n";
-                    tracker.addSupplies(-25, -20, 0, -150);
-                    std::cout << "You lose: 25 wheat, 20 camel food, 150 coins\n";
-                }
-                break;
+        case BANDIT_ATTACK:
+            std::cout << "\n*** RANDOM EVENT: BANDIT ATTACK ***\n";
+            std::cout << getEventDescription(event) << "\n";
+            if (tracker.getWeaponry() > 0) {
+                std::cout << "You defend yourself with your weapons!\n";
+                tracker.addSupplies(0, 0, -5, -100);
+                std::cout << "You lose: 5 weaponry, 100 coins\n";
+            }
+            else {
+                std::cout << "You have no weapons to defend yourself!\n";
+                tracker.addSupplies(-25, -20, 0, -150);
+                std::cout << "You lose: 25 wheat, 20 camel food, 150 coins\n";
+            }
+            break;
 
-            case DISEASE_OUTBREAK:
-                std::cout << "\n*** RANDOM EVENT: DISEASE OUTBREAK ***\n";
-                std::cout << getEventDescription(event) << "\n";
-                tracker.addSupplies(-15, -10, 0, -75);
-                std::cout << "Your party wastes resources fighting the illness.\n";
-                std::cout << "You lose: 15 wheat, 10 camel food, 75 coins\n";
-                break;
+        case DISEASE_OUTBREAK:
+            std::cout << "\n*** RANDOM EVENT: DISEASE OUTBREAK ***\n";
+            std::cout << getEventDescription(event) << "\n";
+            tracker.addSupplies(-15, -10, 0, -75);
+            std::cout << "Your party wastes resources fighting the illness.\n";
+            std::cout << "You lose: 15 wheat, 10 camel food, 75 coins\n";
+            break;
 
-            case STORM:
-                std::cout << "\n*** RANDOM EVENT: SEVERE STORM ***\n";
-                std::cout << getEventDescription(event) << "\n";
-                tracker.addSupplies(-10, -8, 0, 0);
-                std::cout << "You're trapped for days, consuming supplies.\n";
-                std::cout << "You lose: 10 wheat, 8 camel food\n";
-                break;
+        case STORM:
+            std::cout << "\n*** RANDOM EVENT: SEVERE STORM ***\n";
+            std::cout << getEventDescription(event) << "\n";
+            tracker.addSupplies(-10, -8, 0, 0);
+            std::cout << "You're trapped for days, consuming supplies.\n";
+            std::cout << "You lose: 10 wheat, 8 camel food\n";
+            break;
 
-            case FOOD_SPOILAGE:
-                std::cout << "\n*** RANDOM EVENT: FOOD SPOILAGE ***\n";
-                std::cout << getEventDescription(event) << "\n";
-                wheatLoss = tracker.getWheat() / 3;
-                foodLoss = tracker.getCamelFood() / 3;
-                tracker.addSupplies(-wheatLoss, -foodLoss, 0, 0);
-                std::cout << "You lose: " << wheatLoss << " wheat, " << foodLoss << " camel food\n";
-                break;
+        case FOOD_SPOILAGE:
+            std::cout << "\n*** RANDOM EVENT: FOOD SPOILAGE ***\n";
+            std::cout << getEventDescription(event) << "\n";
+            wheatLoss = tracker.getWheat() / 3;
+            foodLoss = tracker.getCamelFood() / 3;
+            tracker.addSupplies(-wheatLoss, -foodLoss, 0, 0);
+            std::cout << "You lose: " << wheatLoss << " wheat, " << foodLoss << " camel food\n";
+            break;
 
-            case NO_EVENT:
-                std::cout << "\n*** Travel uneventful. Clear skies ahead. ***\n";
-                break;
+        case NO_EVENT:
+            std::cout << "\n*** Travel uneventful. Clear skies ahead. ***\n";
+            break;
         }
 
         // Check for critical failures
@@ -499,12 +514,12 @@ public:
         string input;
         while (true) {
             std::cin >> input;
-            
+
             // Check for infinity input
             if (input == "inf" || input == "infinity" || input == "INF" || input == "INFINITY") {
                 return INT_MAX;
             }
-            
+
             try {
                 // Check for extremely large numbers
                 if (input.length() > 10) {
@@ -529,25 +544,25 @@ public:
             displayDebugMenu();
             string choice;
             std::cin >> choice;
-            
+
             if (choice == "1") {
                 displayEventMenu();
                 int eventChoice;
                 std::cin >> eventChoice;
                 RandomEvent::EventType selectedEvent;
-                
+
                 switch (eventChoice) {
-                    case 1: selectedEvent = RandomEvent::CAMEL_DEATH; break;
-                    case 2: selectedEvent = RandomEvent::BOAT_SINKING; break;
-                    case 3: selectedEvent = RandomEvent::BOAT_HOLE; break;
-                    case 4: selectedEvent = RandomEvent::BANDIT_ATTACK; break;
-                    case 5: selectedEvent = RandomEvent::DISEASE_OUTBREAK; break;
-                    case 6: selectedEvent = RandomEvent::STORM; break;
-                    case 7: selectedEvent = RandomEvent::FOOD_SPOILAGE; break;
-                    case 8: selectedEvent = RandomEvent::NO_EVENT; break;
-                    default: selectedEvent = RandomEvent::NO_EVENT; break;
+                case 1: selectedEvent = RandomEvent::CAMEL_DEATH; break;
+                case 2: selectedEvent = RandomEvent::BOAT_SINKING; break;
+                case 3: selectedEvent = RandomEvent::BOAT_HOLE; break;
+                case 4: selectedEvent = RandomEvent::BANDIT_ATTACK; break;
+                case 5: selectedEvent = RandomEvent::DISEASE_OUTBREAK; break;
+                case 6: selectedEvent = RandomEvent::STORM; break;
+                case 7: selectedEvent = RandomEvent::FOOD_SPOILAGE; break;
+                case 8: selectedEvent = RandomEvent::NO_EVENT; break;
+                default: selectedEvent = RandomEvent::NO_EVENT; break;
                 }
-                
+
                 bool journeyEnded = false;
                 RandomEvent::handleEvent(selectedEvent, tracker, camel, boat, journeyEnded);
                 tracker.displaySupplyStatus();
@@ -560,123 +575,123 @@ public:
                     std::cin >> editChoice;
 
                     switch (editChoice) {
-                        case 1: {
-                            std::cout << "Current Wheat: ";
-                            if (tracker.getWheat() == INT_MAX) std::cout << "inf";
-                            else std::cout << tracker.getWheat();
-                            std::cout << "\nEnter new value: ";
-                            int value = getSafeIntInput();
-                            tracker.setWheat(value);
-                            std::cout << "Wheat changed to ";
-                            if (value == INT_MAX) std::cout << "inf";
-                            else std::cout << value;
-                            std::cout << "\n";
-                            break;
-                        }
-                        case 2: {
-                            std::cout << "Current Camel Food: ";
-                            if (tracker.getCamelFood() == INT_MAX) std::cout << "inf";
-                            else std::cout << tracker.getCamelFood();
-                            std::cout << "\nEnter new value: ";
-                            int value = getSafeIntInput();
-                            tracker.setCamelFood(value);
-                            std::cout << "Camel Food changed to ";
-                            if (value == INT_MAX) std::cout << "inf";
-                            else std::cout << value;
-                            std::cout << "\n";
-                            break;
-                        }
-                        case 3: {
-                            std::cout << "Current Weaponry: ";
-                            if (tracker.getWeaponry() == INT_MAX) std::cout << "inf";
-                            else std::cout << tracker.getWeaponry();
-                            std::cout << "\nEnter new value: ";
-                            int value = getSafeIntInput();
-                            tracker.setWeaponry(value);
-                            std::cout << "Weaponry changed to ";
-                            if (value == INT_MAX) std::cout << "inf";
-                            else std::cout << value;
-                            std::cout << "\n";
-                            break;
-                        }
-                        case 4: {
-                            std::cout << "Current Money: ";
-                            if (tracker.getMoney() == INT_MAX) std::cout << "inf";
-                            else std::cout << tracker.getMoney();
-                            std::cout << "\nEnter new value: ";
-                            int value = getSafeIntInput();
-                            tracker.setMoney(value);
-                            std::cout << "Money changed to ";
-                            if (value == INT_MAX) std::cout << "inf";
-                            else std::cout << value;
-                            std::cout << "\n";
-                            break;
-                        }
-                        case 5: {
-                            std::cout << "Current Patch Kit: ";
-                            if (tracker.getPatchKit() == INT_MAX) std::cout << "inf";
-                            else std::cout << tracker.getPatchKit();
-                            std::cout << "\nEnter new value: ";
-                            int value = getSafeIntInput();
-                            tracker.setPatchKit(value);
-                            std::cout << "Patch Kit changed to ";
-                            if (value == INT_MAX) std::cout << "inf";
-                            else std::cout << value;
-                            std::cout << "\n";
-                            break;
-                        }
-                        case 6: {
-                            std::cout << "\n=== Set All Supplies Individually ===\n";
-                            
-                            std::cout << "Enter Wheat amount: ";
-                            int wheat = getSafeIntInput();
-                            
-                            std::cout << "Enter Camel Food amount: ";
-                            int camelFood = getSafeIntInput();
-                            
-                            std::cout << "Enter Weaponry amount: ";
-                            int weaponry = getSafeIntInput();
-                            
-                            std::cout << "Enter Money amount: ";
-                            int money = getSafeIntInput();
-                            
-                            std::cout << "Enter Patch Kit amount: ";
-                            int patchKit = getSafeIntInput();
-                            
-                            tracker.setWheat(wheat);
-                            tracker.setCamelFood(camelFood);
-                            tracker.setWeaponry(weaponry);
-                            tracker.setMoney(money);
-                            tracker.setPatchKit(patchKit);
-                            
-                            std::cout << "\nAll supplies changed to ";
-                            if (wheat == INT_MAX) std::cout << "inf"; else std::cout << wheat;
-                            std::cout << ", ";
-                            if (camelFood == INT_MAX) std::cout << "inf"; else std::cout << camelFood;
-                            std::cout << ", ";
-                            if (weaponry == INT_MAX) std::cout << "inf"; else std::cout << weaponry;
-                            std::cout << ", ";
-                            if (money == INT_MAX) std::cout << "inf"; else std::cout << money;
-                            std::cout << ", ";
-                            if (patchKit == INT_MAX) std::cout << "inf"; else std::cout << patchKit;
-                            std::cout << "!\n";
-                            tracker.displaySupplyStatus();
-                            break;
-                        }
-                        case 7: {
-                            std::cout << "Setting Full Bundle supplies...\n";
-                            tracker.setWheat(100);
-                            tracker.setCamelFood(100);
-                            tracker.setWeaponry(50);
-                            tracker.setMoney(1000);
-                            tracker.setPatchKit(5);
-                            std::cout << "All supplies changed to 100, 100, 50, 1000, 5!\n";
-                            tracker.displaySupplyStatus();
-                            break;
-                        }
-                        case 8:
-                            inEditMenu = false;
-                            break;
+                    case 1: {
+                        std::cout << "Current Wheat: ";
+                        if (tracker.getWheat() == INT_MAX) std::cout << "inf";
+                        else std::cout << tracker.getWheat();
+                        std::cout << "\nEnter new value: ";
+                        int value = getSafeIntInput();
+                        tracker.setWheat(value);
+                        std::cout << "Wheat changed to ";
+                        if (value == INT_MAX) std::cout << "inf";
+                        else std::cout << value;
+                        std::cout << "\n";
+                        break;
+                    }
+                    case 2: {
+                        std::cout << "Current Camel Food: ";
+                        if (tracker.getCamelFood() == INT_MAX) std::cout << "inf";
+                        else std::cout << tracker.getCamelFood();
+                        std::cout << "\nEnter new value: ";
+                        int value = getSafeIntInput();
+                        tracker.setCamelFood(value);
+                        std::cout << "Camel Food changed to ";
+                        if (value == INT_MAX) std::cout << "inf";
+                        else std::cout << value;
+                        std::cout << "\n";
+                        break;
+                    }
+                    case 3: {
+                        std::cout << "Current Weaponry: ";
+                        if (tracker.getWeaponry() == INT_MAX) std::cout << "inf";
+                        else std::cout << tracker.getWeaponry();
+                        std::cout << "\nEnter new value: ";
+                        int value = getSafeIntInput();
+                        tracker.setWeaponry(value);
+                        std::cout << "Weaponry changed to ";
+                        if (value == INT_MAX) std::cout << "inf";
+                        else std::cout << value;
+                        std::cout << "\n";
+                        break;
+                    }
+                    case 4: {
+                        std::cout << "Current Money: ";
+                        if (tracker.getMoney() == INT_MAX) std::cout << "inf";
+                        else std::cout << tracker.getMoney();
+                        std::cout << "\nEnter new value: ";
+                        int value = getSafeIntInput();
+                        tracker.setMoney(value);
+                        std::cout << "Money changed to ";
+                        if (value == INT_MAX) std::cout << "inf";
+                        else std::cout << value;
+                        std::cout << "\n";
+                        break;
+                    }
+                    case 5: {
+                        std::cout << "Current Patch Kit: ";
+                        if (tracker.getPatchKit() == INT_MAX) std::cout << "inf";
+                        else std::cout << tracker.getPatchKit();
+                        std::cout << "\nEnter new value: ";
+                        int value = getSafeIntInput();
+                        tracker.setPatchKit(value);
+                        std::cout << "Patch Kit changed to ";
+                        if (value == INT_MAX) std::cout << "inf";
+                        else std::cout << value;
+                        std::cout << "\n";
+                        break;
+                    }
+                    case 6: {
+                        std::cout << "\n=== Set All Supplies Individually ===\n";
+
+                        std::cout << "Enter Wheat amount: ";
+                        int wheat = getSafeIntInput();
+
+                        std::cout << "Enter Camel Food amount: ";
+                        int camelFood = getSafeIntInput();
+
+                        std::cout << "Enter Weaponry amount: ";
+                        int weaponry = getSafeIntInput();
+
+                        std::cout << "Enter Money amount: ";
+                        int money = getSafeIntInput();
+
+                        std::cout << "Enter Patch Kit amount: ";
+                        int patchKit = getSafeIntInput();
+
+                        tracker.setWheat(wheat);
+                        tracker.setCamelFood(camelFood);
+                        tracker.setWeaponry(weaponry);
+                        tracker.setMoney(money);
+                        tracker.setPatchKit(patchKit);
+
+                        std::cout << "\nAll supplies changed to ";
+                        if (wheat == INT_MAX) std::cout << "inf"; else std::cout << wheat;
+                        std::cout << ", ";
+                        if (camelFood == INT_MAX) std::cout << "inf"; else std::cout << camelFood;
+                        std::cout << ", ";
+                        if (weaponry == INT_MAX) std::cout << "inf"; else std::cout << weaponry;
+                        std::cout << ", ";
+                        if (money == INT_MAX) std::cout << "inf"; else std::cout << money;
+                        std::cout << ", ";
+                        if (patchKit == INT_MAX) std::cout << "inf"; else std::cout << patchKit;
+                        std::cout << "!\n";
+                        tracker.displaySupplyStatus();
+                        break;
+                    }
+                    case 7: {
+                        std::cout << "Setting Full Bundle supplies...\n";
+                        tracker.setWheat(100);
+                        tracker.setCamelFood(100);
+                        tracker.setWeaponry(50);
+                        tracker.setMoney(1000);
+                        tracker.setPatchKit(5);
+                        std::cout << "All supplies changed to 100, 100, 50, 1000, 5!\n";
+                        tracker.displaySupplyStatus();
+                        break;
+                    }
+                    case 8:
+                        inEditMenu = false;
+                        break;
                     }
                 }
             }
@@ -686,35 +701,35 @@ public:
                     displayEditPricesMenu();
                     int priceChoice;
                     std::cin >> priceChoice;
-                    
+
                     switch (priceChoice) {
-                        case 1: {
-                            std::cout << "Enter new Wheat price: ";
-                            int price = getSafeIntInput();
-                            std::cout << "Wheat price changed to " << price << "\n";
-                            break;
-                        }
-                        case 2: {
-                            std::cout << "Enter new Camel Food price: ";
-                            int price = getSafeIntInput();
-                            std::cout << "Camel Food price changed to " << price << "\n";
-                            break;
-                        }
-                        case 3: {
-                            std::cout << "Enter new Weaponry price: ";
-                            int price = getSafeIntInput();
-                            std::cout << "Weaponry price changed to " << price << "\n";
-                            break;
-                        }
-                        case 4: {
-                            std::cout << "Enter new Patch Kit price: ";
-                            int price = getSafeIntInput();
-                            std::cout << "Patch Kit price changed to " << price << "\n";
-                            break;
-                        }
-                        case 5:
-                            inPriceMenu = false;
-                            break;
+                    case 1: {
+                        std::cout << "Enter new Wheat price: ";
+                        int price = getSafeIntInput();
+                        std::cout << "Wheat price changed to " << price << "\n";
+                        break;
+                    }
+                    case 2: {
+                        std::cout << "Enter new Camel Food price: ";
+                        int price = getSafeIntInput();
+                        std::cout << "Camel Food price changed to " << price << "\n";
+                        break;
+                    }
+                    case 3: {
+                        std::cout << "Enter new Weaponry price: ";
+                        int price = getSafeIntInput();
+                        std::cout << "Weaponry price changed to " << price << "\n";
+                        break;
+                    }
+                    case 4: {
+                        std::cout << "Enter new Patch Kit price: ";
+                        int price = getSafeIntInput();
+                        std::cout << "Patch Kit price changed to " << price << "\n";
+                        break;
+                    }
+                    case 5:
+                        inPriceMenu = false;
+                        break;
                     }
                 }
             }
@@ -724,53 +739,53 @@ public:
                     displayEditRNGMenu();
                     int rngChoice;
                     std::cin >> rngChoice;
-                    
+
                     switch (rngChoice) {
-                        case 1: {
-                            std::cout << "Enter new Camel Death threshold (0-100): ";
-                            int threshold = getSafeIntInput();
-                            std::cout << "Camel Death threshold changed to " << threshold << "\n";
-                            break;
-                        }
-                        case 2: {
-                            std::cout << "Enter new Boat Sinking threshold (0-100): ";
-                            int threshold = getSafeIntInput();
-                            std::cout << "Boat Sinking threshold changed to " << threshold << "\n";
-                            break;
-                        }
-                        case 3: {
-                            std::cout << "Enter new Boat Hole threshold (0-100): ";
-                            int threshold = getSafeIntInput();
-                            std::cout << "Boat Hole threshold changed to " << threshold << "\n";
-                            break;
-                        }
-                        case 4: {
-                            std::cout << "Enter new Bandit Attack threshold (0-100): ";
-                            int threshold = getSafeIntInput();
-                            std::cout << "Bandit Attack threshold changed to " << threshold << "\n";
-                            break;
-                        }
-                        case 5: {
-                            std::cout << "Enter new Disease Outbreak threshold (0-100): ";
-                            int threshold = getSafeIntInput();
-                            std::cout << "Disease Outbreak threshold changed to " << threshold << "\n";
-                            break;
-                        }
-                        case 6: {
-                            std::cout << "Enter new Storm threshold (0-100): ";
-                            int threshold = getSafeIntInput();
-                            std::cout << "Storm threshold changed to " << threshold << "\n";
-                            break;
-                        }
-                        case 7: {
-                            std::cout << "Enter new Food Spoilage threshold (0-100): ";
-                            int threshold = getSafeIntInput();
-                            std::cout << "Food Spoilage threshold changed to " << threshold << "\n";
-                            break;
-                        }
-                        case 8:
-                            inRNGMenu = false;
-                            break;
+                    case 1: {
+                        std::cout << "Enter new Camel Death threshold (0-100): ";
+                        int threshold = getSafeIntInput();
+                        std::cout << "Camel Death threshold changed to " << threshold << "\n";
+                        break;
+                    }
+                    case 2: {
+                        std::cout << "Enter new Boat Sinking threshold (0-100): ";
+                        int threshold = getSafeIntInput();
+                        std::cout << "Boat Sinking threshold changed to " << threshold << "\n";
+                        break;
+                    }
+                    case 3: {
+                        std::cout << "Enter new Boat Hole threshold (0-100): ";
+                        int threshold = getSafeIntInput();
+                        std::cout << "Boat Hole threshold changed to " << threshold << "\n";
+                        break;
+                    }
+                    case 4: {
+                        std::cout << "Enter new Bandit Attack threshold (0-100): ";
+                        int threshold = getSafeIntInput();
+                        std::cout << "Bandit Attack threshold changed to " << threshold << "\n";
+                        break;
+                    }
+                    case 5: {
+                        std::cout << "Enter new Disease Outbreak threshold (0-100): ";
+                        int threshold = getSafeIntInput();
+                        std::cout << "Disease Outbreak threshold changed to " << threshold << "\n";
+                        break;
+                    }
+                    case 6: {
+                        std::cout << "Enter new Storm threshold (0-100): ";
+                        int threshold = getSafeIntInput();
+                        std::cout << "Storm threshold changed to " << threshold << "\n";
+                        break;
+                    }
+                    case 7: {
+                        std::cout << "Enter new Food Spoilage threshold (0-100): ";
+                        int threshold = getSafeIntInput();
+                        std::cout << "Food Spoilage threshold changed to " << threshold << "\n";
+                        break;
+                    }
+                    case 8:
+                        inRNGMenu = false;
+                        break;
                     }
                 }
             }
@@ -790,28 +805,29 @@ int getValidInputWithDemo(int minValue, int maxValue, SupplyTracker* tracker = n
     string input;
     while (true) {
         std::cin >> input;
-        
+
         // Check for DEMO command
         if (input == "DEMO" || input == "demo") {
             if (tracker != nullptr && camel != nullptr && boat != nullptr) {
                 DebugMenu::handleDebugMenu(*tracker, *camel, *boat);
                 // Redisplay the original menu based on menuType
                 switch (menuType) {
-                    case 1: displayBoatMenu(); break;
-                    case 2: displayCamelMenu(); break;
-                    case 3: displaySuppliesMenu(); break;
-                    case 4: displayStopMenu(); break;
-                    case 5: displayBoatPurchaseMenu(); break;
-                    case 6: displayCamelTradingMenu(); break;
+                case 1: displayBoatMenu(); break;
+                case 2: displayCamelMenu(); break;
+                case 3: displaySuppliesMenu(); break;
+                case 4: displayStopMenu(); break;
+                case 5: displayBoatPurchaseMenu(); break;
+                case 6: displayCamelTradingMenu(); break;
                 }
                 std::cout << "Enter your choice: ";
                 continue;
-            } else {
+            }
+            else {
                 std::cout << "Enter your choice: ";
                 continue;
             }
         }
-        
+
         // Try to convert to int
         try {
             int result = std::stoi(input);
@@ -835,7 +851,7 @@ int getValidInput(int minValue, int maxValue) {
     int input;
     while (true) {
         std::cin >> input;
-        
+
         // Check if input failed (non-numeric)
         if (std::cin.fail()) {
             std::cin.clear();
@@ -843,13 +859,13 @@ int getValidInput(int minValue, int maxValue) {
             std::cout << "Invalid input! Please enter a number between " << minValue << " and " << maxValue << ": ";
             continue;
         }
-        
+
         // Check if input is within range
         if (input < minValue || input > maxValue) {
             std::cout << "Invalid choice! Please select between " << minValue << " and " << maxValue << ": ";
             continue;
         }
-        
+
         return input;
     }
 }
@@ -858,7 +874,7 @@ int getValidInput(int minValue, int maxValue) {
 void slowPrint(const string& text, int delayMs) {
     for (size_t i = 0; i < text.length(); ++i) {
         std::cout << text[i] << std::flush;
-        
+
         // Check if key was pressed (non-blocking)
         if (_kbhit()) {
             int key = _getch();
@@ -868,7 +884,7 @@ void slowPrint(const string& text, int delayMs) {
                 return;
             }
         }
-        
+
         if (delayMs > 0) {
             std::this_thread::sleep_for(std::chrono::milliseconds(delayMs));
         }
@@ -892,7 +908,7 @@ void displayPrequel() {
     slowPrint("NICOLO (Your Father):\n");
     slowPrint("\"Marco! There you are. We've been waiting for you. Listen closely, my son.\n");
     slowPrint("Your uncle and I have just returned from the East. We've traveled roads that few\n");
-    slowPrint("Venetians have ever dared to venture upon. The riches we saw... magnificent!\"\n\n());
+    slowPrint("Venetians have ever dared to venture upon. The riches we saw... magnificent!\"\n\n");
 
     slowPrint("MAFFEO (Your Uncle):\n");
     slowPrint("\"Yes, Marco. We reached the court of the great Kublai Khan himself! The Khan\n");
@@ -953,61 +969,61 @@ void displayPrequel() {
 
 vector<JourneyStop> initializeJourneyStops() {
     vector<JourneyStop> stops;
-    stops.push_back(JourneyStop("Venice", 1271, 
+    stops.push_back(JourneyStop("Venice", 1271,
         "You depart Venice with your father and uncle.\nA bustling Mediterranean port city.\n"
-        "FACT: Venice was the center of European trade, controlling Mediterranean commerce\nthrough its powerful merchant republic.", 
+        "FACT: Venice was the center of European trade, controlling Mediterranean commerce\nthrough its powerful merchant republic.",
         5, 3, 2, "Postal service"));
-    stops.push_back(JourneyStop("Mediterranean Sea Voyage", 1271, 
+    stops.push_back(JourneyStop("Mediterranean Sea Voyage", 1271,
         "You sail across the Mediterranean in a Venetian galley.\nThe sea is both beautiful and treacherous.\n"
-        "FACT: Venetian galleys were the primary vessels for Mediterranean trade,\nfeatures multiple sails and could carry large cargo loads across dangerous waters.", 
+        "FACT: Venetian galleys were the primary vessels for Mediterranean trade,\nfeatures multiple sails and could carry large cargo loads across dangerous waters.",
         6, 4, 2, ""));
-    stops.push_back(JourneyStop("Holy Land", 1271, 
+    stops.push_back(JourneyStop("Holy Land", 1271,
         "You travel through the Holy Land.\nA sacred region filled with historical sites.\n"
-        "FACT: The Holy Land was a crucial junction between Europe and Asia,\nwhere merchants exchanged goods and gathered intelligence about Eastern routes.", 
+        "FACT: The Holy Land was a crucial junction between Europe and Asia,\nwhere merchants exchanged goods and gathered intelligence about Eastern routes.",
         8, 5, 3, "Spices"));
-    stops.push_back(JourneyStop("Persia", 1272, 
+    stops.push_back(JourneyStop("Persia", 1272,
         "You journey through the Persian Empire.\nA magnificent land of deserts and cities.\n"
-        "FACT: Persia was a major crossroads of the Silk Road, where Persian merchants\ncontrolled valuable trade routes and accumulated great wealth from tariffs.", 
+        "FACT: Persia was a major crossroads of the Silk Road, where Persian merchants\ncontrolled valuable trade routes and accumulated great wealth from tariffs.",
         10, 6, 4, "Coal heating"));
-    stops.push_back(JourneyStop("Pamir Mountains", 1273, 
+    stops.push_back(JourneyStop("Pamir Mountains", 1273,
         "You cross the treacherous Pamir Mountains.\nA dangerous passage through high peaks.\n"
-        "FACT: The Pamir Mountains were one of the most dangerous sections of the Silk Road,\nwhere many travelers perished from altitude sickness and extreme weather conditions.", 
+        "FACT: The Pamir Mountains were one of the most dangerous sections of the Silk Road,\nwhere many travelers perished from altitude sickness and extreme weather conditions.",
         12, 8, 5, "Asbestos"));
-    stops.push_back(JourneyStop("Kublai Khan's Court", 1275, 
+    stops.push_back(JourneyStop("Kublai Khan's Court", 1275,
         "You finally reach the court of Kublai Khan!\nA grand city with incredible wealth.\n"
-        "FACT: Kublai Khan's court at Xanadu was a cosmopolitan center of power,\nwhere the Khan employed people from across his vast Mongol Empire.", 
+        "FACT: Kublai Khan's court at Xanadu was a cosmopolitan center of power,\nwhere the Khan employed people from across his vast Mongol Empire.",
         6, 4, 3, "Advanced urban cities"));
-    stops.push_back(JourneyStop("Southern China", 1279, 
+    stops.push_back(JourneyStop("Southern China", 1279,
         "You travel to southern China on official missions.\nFascinating new lands and peoples.\n"
-        "FACT: Southern China under Kublai Khan was highly urbanized with advanced infrastructure,\nincluding canals, roads, and sophisticated administrative systems.", 
+        "FACT: Southern China under Kublai Khan was highly urbanized with advanced infrastructure,\nincluding canals, roads, and sophisticated administrative systems.",
         7, 5, 3, "Porcelain"));
-    stops.push_back(JourneyStop("Burma", 1280, 
+    stops.push_back(JourneyStop("Burma", 1280,
         "You explore the exotic lands of Burma.\nLush forests and ancient temples await.\n"
-        "FACT: Burma was a tributary state of the Mongol Empire, providing exotic goods\nlike rubies, jade, and rare spices to Kublai Khan's court.", 
+        "FACT: Burma was a tributary state of the Mongol Empire, providing exotic goods\nlike rubies, jade, and rare spices to Kublai Khan's court.",
         9, 6, 4, "Petroleum"));
-    stops.push_back(JourneyStop("Indian Ocean Voyage", 1281, 
+    stops.push_back(JourneyStop("Indian Ocean Voyage", 1281,
         "You embark on a perilous journey across the Indian Ocean in a Chinese junk.\nThe vast waters stretch endlessly before you.\n"
-        "FACT: Chinese junks were advanced sailing vessels with watertight compartments,\nallowing Marco Polo to safely traverse the Indian Ocean's dangerous waters.", 
+        "FACT: Chinese junks were advanced sailing vessels with watertight compartments,\nallowing Marco Polo to safely traverse the Indian Ocean's dangerous waters.",
         10, 8, 5, ""));
-    stops.push_back(JourneyStop("India", 1281, 
+    stops.push_back(JourneyStop("India", 1281,
         "You venture into India on behalf of the Khan.\nRich spices and precious gems abound.\n"
-        "FACT: India's spice trade was highly valued in medieval times, with pepper,\ncloves, and nutmeg worth their weight in gold in European markets.", 
+        "FACT: India's spice trade was highly valued in medieval times, with pepper,\ncloves, and nutmeg worth their weight in gold in European markets.",
         8, 7, 4, "Paper money"));
-    stops.push_back(JourneyStop("Return Journey - India", 1292, 
+    stops.push_back(JourneyStop("Return Journey - India", 1292,
         "After 20 years, Kublai Khan permits your return.\nYou begin heading back through familiar lands.\n"
-        "FACT: Marco Polo spent over 20 years in service to Kublai Khan,\nbecoming one of the Khan's most trusted and valued foreign advisors.", 
+        "FACT: Marco Polo spent over 20 years in service to Kublai Khan,\nbecoming one of the Khan's most trusted and valued foreign advisors.",
         8, 7, 4, "Maps and Navigation Charts"));
-    stops.push_back(JourneyStop("Return Journey - Burma", 1293, 
+    stops.push_back(JourneyStop("Return Journey - Burma", 1293,
         "Retracing your steps through Burma.\nThe exotic lands are familiar now.\n"
-        "FACT: The return journey was perilous, with many traveling companions perishing\nbefore reaching the relative safety of Persia.", 
+        "FACT: The return journey was perilous, with many traveling companions perishing\nbefore reaching the relative safety of Persia.",
         9, 6, 4, ""));
-    stops.push_back(JourneyStop("Return Journey - Persia", 1294, 
+    stops.push_back(JourneyStop("Return Journey - Persia", 1294,
         "Traveling through Persia on the return voyage.\nThe desert winds guide you home.\n"
-        "FACT: Upon returning to Persia, the Polos learned that Kublai Khan had died,\nmaking their service to him part of history.", 
+        "FACT: Upon returning to Persia, the Polos learned that Kublai Khan had died,\nmaking their service to him part of history.",
         10, 6, 4, ""));
-    stops.push_back(JourneyStop("Venice", 1295, 
+    stops.push_back(JourneyStop("Venice", 1295,
         "You arrive home in Venice with great wealth!\nYour legendary journey is complete.\n"
-        "FACT: When Marco Polo returned to Venice, few believed his stories.\nHe later dictated his adventures to Rustichello da Pisa while imprisoned,\ncreating 'The Travels of Marco Polo', a work that inspired generations.", 
+        "FACT: When Marco Polo returned to Venice, few believed his stories.\nHe later dictated his adventures to Rustichello da Pisa while imprisoned,\ncreating 'The Travels of Marco Polo', a work that inspired generations.",
         0, 0, 0, ""));
     return stops;
 }
@@ -1061,69 +1077,69 @@ void displayStopMenu() {
 
 string getSuppliesChoice(int choice) {
     switch (choice) {
-        case 1: return "Wheat (ESSENTIAL)";
-        case 2: return "Camel Food (OPTIONAL)";
-        case 3: return "Bow/Knife (OPTIONAL)";
-        case 4: return "Money (ESSENTIAL)";
-        case 5: return "Wheat + Camel Food Bundle";
-        case 6: return "Full Bundle (Wheat, Camel Food, Bow/Knife, Money)";
-        default: return "Wheat (ESSENTIAL)";
+    case 1: return "Wheat (ESSENTIAL)";
+    case 2: return "Camel Food (OPTIONAL)";
+    case 3: return "Bow/Knife (OPTIONAL)";
+    case 4: return "Money (ESSENTIAL)";
+    case 5: return "Wheat + Camel Food Bundle";
+    case 6: return "Full Bundle (Wheat, Camel Food, Bow/Knife, Money)";
+    default: return "Wheat (ESSENTIAL)";
     }
 }
 
 SupplyTracker createSupplyTracker(int choice) {
     switch (choice) {
-        case 1: return SupplyTracker(50, 0, 0, 500);
-        case 2: return SupplyTracker(0, 40, 0, 500);
-        case 3: return SupplyTracker(0, 0, 15, 500);
-        case 4: return SupplyTracker(0, 0, 0, 500);
-        case 5: return SupplyTracker(50, 40, 0, 500);
-        case 6: return SupplyTracker(50, 40, 15, 500);
-        default: return SupplyTracker(50, 0, 0, 500);
+    case 1: return SupplyTracker(50, 0, 0, 500);
+    case 2: return SupplyTracker(0, 40, 0, 500);
+    case 3: return SupplyTracker(0, 0, 15, 500);
+    case 4: return SupplyTracker(0, 0, 0, 500);
+    case 5: return SupplyTracker(50, 40, 0, 500);
+    case 6: return SupplyTracker(50, 40, 15, 500);
+    default: return SupplyTracker(50, 0, 0, 500);
     }
 }
 
 Boat createBoatChoice(int choice) {
     switch (choice) {
-        case 1: return Boat("Small Fishing Boat", 1, 12, 500, 2, "Dried Fish, Fresh Water");
-        case 2: return Boat("Arab Dhow", 2, 8, 700, 3, "Spices, Silk, Tea");
-        case 3: return Boat("Small Trader", 2, 15, 600, 4, "Gems, Perfume, Rice");
-        case 4: return Boat("Coastal Vessel", 2, 10, 650, 4, "Wine, Olive Oil, Wheat");
-        case 5: return Boat("Mediterranean Cruiser", 3, 18, 750, 5, "Fine Linens, Amber");
-        case 6: return Boat("Old Dhow", 2, 25, 800, 5, "Gold, Ivory, Textiles");
-        default: return Boat("Small Fishing Boat", 1, 12, 500, 2, "Dried Fish, Fresh Water");
+    case 1: return Boat("Small Fishing Boat", 1, 12, 500, 2, "Dried Fish, Fresh Water");
+    case 2: return Boat("Arab Dhow", 2, 8, 700, 3, "Spices, Silk, Tea");
+    case 3: return Boat("Small Trader", 2, 15, 600, 4, "Gems, Perfume, Rice");
+    case 4: return Boat("Coastal Vessel", 2, 10, 650, 4, "Wine, Olive Oil, Wheat");
+    case 5: return Boat("Mediterranean Cruiser", 3, 18, 750, 5, "Fine Linens, Amber");
+    case 6: return Boat("Old Dhow", 2, 25, 800, 5, "Gold, Ivory, Textiles");
+    default: return Boat("Small Fishing Boat", 1, 12, 500, 2, "Dried Fish, Fresh Water");
     }
 }
 
 Boat createOceanBoatChoice(int choice) {
     switch (choice) {
-        case 1: return Boat("Venetian Galley", 3, 8, 2000, 8, "Supplies, Cargo");
-        case 2: return Boat("Arab Dhow", 2, 6, 1500, 6, "Spices, Trade Goods");
-        case 3: return Boat("Chinese Junk", 4, 5, 3000, 10, "Silk, Ceramics");
-        case 4: return Boat("Trade Cog", 2, 7, 1800, 7, "Wine, Grains");
-        default: return Boat("Venetian Galley", 3, 8, 2000, 8, "Supplies, Cargo");
+    case 1: return Boat("Venetian Galley", 3, 8, 2000, 8, "Supplies, Cargo");
+    case 2: return Boat("Arab Dhow", 2, 6, 1500, 6, "Spices, Trade Goods");
+    case 3: return Boat("Chinese Junk", 4, 5, 3000, 10, "Silk, Ceramics");
+    case 4: return Boat("Trade Cog", 2, 7, 1800, 7, "Wine, Grains");
+    default: return Boat("Venetian Galley", 3, 8, 2000, 8, "Supplies, Cargo");
     }
 }
 
 int getBoatCost(int choice) {
     switch (choice) {
-        case 1: return 150;
-        case 2: return 100;
-        case 3: return 200;
-        case 4: return 120;
-        default: return 150;
+    case 1: return 150;
+    case 2: return 100;
+    case 3: return 200;
+    case 4: return 120;
+    default: return 150;
     }
 }
 
 Camel createCamelChoice(int choice) {
     switch (choice) {
-        case 1: return Camel("Bactrian", 2, 12, 700, 100, "Salt, Dates, Water Skins");
-        case 2: return Camel("Dromedary", 1, 8, 550, 75, "Incense, Frankincense, Myrrh");
-        case 3: return Camel("Wild Camel", 2, 15, 880, 90, "Tapestries, Wool, Furs");
-        case 4: return Camel("Young Bactrian", 2, 3, 440, 50, "None");
-        case 5: return Camel("Old Dromedary", 1, 25, 770, 85, "Jade, Porcelain, Spices");
-        case 6: return Camel("Desert Camel", 1, 10, 620, 80, "Carpets, Leather, Herbs");
-        default: return Camel("Bactrian", 2, 12, 700, 100, "Salt, Dates, Water Skins");
+    case 1: return Camel("Bactrian", 2, 12, 700, 100, "Salt, Dates, Water Skins");
+    case 2: return Camel("Dromedary", 1, 8, 550, 75, "Incense, Frankincense, Myrrh");
+    case 3: return Camel("Wild Camel", 2, 15, 880, 90, "Tapestries, Wool, Furs");
+    case 4: return Camel("Young Bactrian", 2, 3, 440, 50, "None");
+    case 5: return Camel("Old Dromedary", 1, 25, 770, 85, "Jade, Porcelain, Spices");
+    case 6: return Camel("Desert Camel", 1, 10, 620, 80, "Carpets, Leather, Herbs");
+    default: return Camel("Bactrian", 2, 12, 700, 100, "Salt, Dates, Water Skins");
     }
 }
 
@@ -1155,7 +1171,8 @@ public:
 
         Weapon() : type(NONE), name("None"), damageBonus(0), cost(0), description("") {}
         Weapon(WeaponType t, const string& n, int damage, int c, const string& desc)
-            : type(t), name(n), damageBonus(damage), cost(c), description(desc) {}
+            : type(t), name(n), damageBonus(damage), cost(c), description(desc) {
+        }
     };
 
     static void displayAdvancedWeaponryMenu() {
@@ -1174,25 +1191,25 @@ public:
 
     static Weapon getWeaponChoice(int choice) {
         switch (choice) {
-            case 1: return Weapon(SWORD, "Steel Sword", 20, 50, 
-                "A finely crafted steel sword for close combat");
-            case 2: return Weapon(BOW, "Composite Bow", 25, 60, 
-                "A powerful composite bow for distant threats");
-            case 3: return Weapon(ARMOR, "Leather Armor", 15, 55, 
-                "Protective leather armor to reduce damage");
-            case 4: return Weapon(NONE, "Full Combat Set", 60, 130, 
-                "Sword + Bow + Armor (all bonuses combined)");
-            default: return Weapon();
+        case 1: return Weapon(SWORD, "Steel Sword", 20, 50,
+            "A finely crafted steel sword for close combat");
+        case 2: return Weapon(BOW, "Composite Bow", 25, 60,
+            "A powerful composite bow for distant threats");
+        case 3: return Weapon(ARMOR, "Leather Armor", 15, 55,
+            "Protective leather armor to reduce damage");
+        case 4: return Weapon(NONE, "Full Combat Set", 60, 130,
+            "Sword + Bow + Armor (all bonuses combined)");
+        default: return Weapon();
         }
     }
 
     static int getWeaponCost(int choice) {
         switch (choice) {
-            case 1: return 50;
-            case 2: return 60;
-            case 3: return 55;
-            case 4: return 130;
-            default: return 0;
+        case 1: return 50;
+        case 2: return 60;
+        case 3: return 55;
+        case 4: return 130;
+        default: return 0;
         }
     }
 };
@@ -1208,16 +1225,16 @@ private:
     int totalResources;
     bool caught;
     vector<vector<char>> grid;
-    
+
 public:
-    MiningMinigame() : playerX(1), playerY(1), guardX(GRID_WIDTH - 2), guardY(GRID_HEIGHT - 2), 
-                       resourcesCollected(0), totalResources(5), caught(false) {
+    MiningMinigame() : playerX(1), playerY(1), guardX(GRID_WIDTH - 2), guardY(GRID_HEIGHT - 2),
+        resourcesCollected(0), totalResources(5), caught(false) {
         initializeGrid();
     }
-    
+
     void initializeGrid() {
         grid.assign(GRID_HEIGHT, vector<char>(GRID_WIDTH, '.'));
-        
+
         // Add borders
         for (int x = 0; x < GRID_WIDTH; ++x) {
             grid[0][x] = '#';
@@ -1227,7 +1244,7 @@ public:
             grid[y][0] = '#';
             grid[y][GRID_WIDTH - 1] = '#';
         }
-        
+
         // Place resources randomly
         srand(static_cast<unsigned>(time(nullptr)));
         int resourcesPlaced = 0;
@@ -1239,12 +1256,12 @@ public:
                 resourcesPlaced++;
             }
         }
-        
+
         // Set initial positions
         grid[playerY][playerX] = 'P';
         grid[guardY][guardX] = 'G';
     }
-    
+
     void displayGrid() const {
         system("cls");
         std::cout << "\n========== ILLEGAL MINING OPERATION ==========\n";
@@ -1252,7 +1269,7 @@ public:
         std::cout << "Controls: W=Up, S=Down, A=Left, D=Right, Q=Quit\n";
         std::cout << "Resources: " << resourcesCollected << "/" << totalResources << "\n";
         std::cout << "============================================\n\n";
-        
+
         for (int y = 0; y < GRID_HEIGHT; ++y) {
             for (int x = 0; x < GRID_WIDTH; ++x) {
                 std::cout << grid[y][x];
@@ -1261,69 +1278,68 @@ public:
         }
         std::cout << "\nP = You, G = Guard, * = Resources, # = Wall\n";
     }
-    
+
     void movePlayer(char direction) {
         grid[playerY][playerX] = '.';
-        
+
         int newX = playerX, newY = playerY;
-        
+
         if (direction == 'w' || direction == 'W') newY--;
         else if (direction == 's' || direction == 'S') newY++;
         else if (direction == 'a' || direction == 'A') newX--;
         else if (direction == 'd' || direction == 'D') newX++;
-        
+
         // Check boundaries and walls
         if (grid[newY][newX] != '#') {
             // Check if collecting resource
             if (grid[newY][newX] == '*') {
                 resourcesCollected++;
             }
-            
+
             playerX = newX;
             playerY = newY;
         }
-        
+
         grid[playerY][playerX] = 'P';
     }
-    
+
     void moveGuard() {
         grid[guardY][guardX] = '.';
-        
+
         // Simple AI: move towards player
         int dx = (playerX > guardX) ? 1 : (playerX < guardX) ? -1 : 0;
         int dy = (playerY > guardY) ? 1 : (playerY < guardY) ? -1 : 0;
-        
+
         int newX = guardX + dx;
         int newY = guardY + dy;
-        
+
         // Check if can move
         if (grid[newY][newX] != '#') {
             guardX = newX;
             guardY = newY;
         }
-        
+
         grid[guardY][guardX] = 'G';
     }
-    
+
     bool checkCaught() const {
         return (playerX == guardX && playerY == guardY);
     }
-    
+
     bool allResourcesCollected() const {
         return resourcesCollected >= totalResources;
     }
-    
+
     int getResourcesCollected() const {
         return resourcesCollected;
     }
-    
+
     void play() {
         char input;
-        int moveCounter = 0;
-        
+
         while (!caught && !allResourcesCollected()) {
             displayGrid();
-            
+
             if (_kbhit()) {
                 input = _getch();
                 if (input == 'q' || input == 'Q') {
@@ -1334,10 +1350,10 @@ public:
                 movePlayer(input);
                 movePlayer(input);  // Double movement for faster speed
             }
-            
+
             // Guard moves every player move (faster guard)
             moveGuard();
-            
+
             // Check if caught
             if (checkCaught()) {
                 caught = true;
@@ -1349,7 +1365,7 @@ public:
                 std::this_thread::sleep_for(std::chrono::milliseconds(2000));
                 return;
             }
-            
+
             // Check if all resources collected
             if (allResourcesCollected()) {
                 displayGrid();
@@ -1358,7 +1374,7 @@ public:
                 std::this_thread::sleep_for(std::chrono::milliseconds(1000));
                 return;
             }
-            
+
             std::this_thread::sleep_for(std::chrono::milliseconds(100));  // Faster refresh
         }
     }
@@ -1367,36 +1383,38 @@ public:
 void playMiningMinigame(SupplyTracker& tracker) {
     std::cout << "\n========== ILLEGAL MINING MINIGAME ==========\n";
     std::cout << "DANGER: If caught, you will be executed!\n";
-    std::cout << "You discover an opportunity to mine precious stones!\n";
-    std::cout << "If you succeed, you'll gain resources and money.\n";
+    std::cout << "You discover an opportunity to mine precious rubies!\n";
+    std::cout << "If you succeed, you'll gain valuable gems worth a fortune.\n";
     std::cout << "But if you're caught, you DIE and the journey ends!\n";
     std::cout << "\nAttempt the mining operation? (y/n): ";
-    
+
     char response;
     std::cin >> response;
-    
+
     if (response != 'y' && response != 'Y') {
         std::cout << "You decide it's too risky and move on.\n";
         return;
     }
-    
+
     MiningMinigame game;
     game.play();
-    
+
     int resourcesGained = game.getResourcesCollected();
-    
+
     if (resourcesGained > 0) {
-        int wheatGain = resourcesGained * 15;
-        int moneyGain = resourcesGained * 100;
-        
-        tracker.addSupplies(wheatGain, 0, 0, moneyGain);
-        
+        int rubiesGained = resourcesGained * 3;
+        int coinsFromRubies = rubiesGained * 50;
+
+        tracker.addRubies(rubiesGained);
+        tracker.addSupplies(0, 0, 0, coinsFromRubies);
+
         std::cout << "\n*** MINING REWARDS ***\n";
-        std::cout << "Gained: " << wheatGain << " wheat units\n";
-        std::cout << "Gained: " << moneyGain << " coins\n";
+        std::cout << "Gained: " << rubiesGained << " rubies!\n";
+        std::cout << "Rubies converted to coins: " << coinsFromRubies << " coins\n";
         std::cout << "Morale boost from success!\n";
         tracker.restoreMorale(15);
-    } else {
+    }
+    else {
         std::cout << "\nYour mining operation failed!\n";
         std::cout << "CRITICAL: You were executed by the authorities!\n";
         std::cout << "GAME OVER - YOUR JOURNEY ENDS HERE\n";
@@ -1417,7 +1435,7 @@ int main() {
     while (!hasBoat) {
         displayBoatMenu();
         std::cout << "Enter your choice: ";
-        int boatChoice = getValidInputWithDemo(1, 6, nullptr, nullptr, nullptr, 1)
+        int boatChoice = getValidInputWithDemo(1, 6, nullptr, nullptr, nullptr, 1);
 
         std::cout << "\n";
         selectedBoat = createBoatChoice(boatChoice);
@@ -1426,7 +1444,8 @@ int main() {
 
         if (selectedBoat.isTooOld()) {
             std::cout << "*** WARNING: There is a high risk of failure! ***\n";
-        } else {
+        }
+        else {
             std::cout << "This boat is in good condition.\n";
         }
 
@@ -1435,7 +1454,8 @@ int main() {
         std::cin >> response;
         if (response == 'y' || response == 'Y') {
             hasBoat = true;
-        } else {
+        }
+        else {
             std::cout << "\n";
         }
     }
@@ -1456,7 +1476,8 @@ int main() {
 
         if (selectedCamel.isTooYoung() || selectedCamel.isTooOld()) {
             std::cout << "*** WARNING: There is a high risk of failure! ***\n";
-        } else {
+        }
+        else {
             std::cout << "This camel is in good condition.\n";
         }
 
@@ -1468,7 +1489,7 @@ int main() {
         }
         std::cout << "\n";
     }
-   
+
     // Supplies selection
     int suppliesChoice;
     bool hasSupplies = false;
@@ -1529,30 +1550,31 @@ int main() {
 
         // Check if this is an ocean voyage leg
         if ((i == 1 && currentStop.getName() == "Mediterranean Sea Voyage")) {
-            
+
             std::cout << "\n*** OCEAN VOYAGE AHEAD ***\n";
             std::cout << "You will use your selected boat: " << selectedBoat.getType() << "\n";
             std::cout << "Preparing for sea voyage...\n";
-            
-        } else if (i == 8 && currentStop.getName() == "Indian Ocean Voyage") {
-            
+
+        }
+        else if (i == 8 && currentStop.getName() == "Indian Ocean Voyage") {
+
             std::cout << "\n*** OCEAN VOYAGE AHEAD ***\n";
             std::cout << "Your current boat is not suited for the Indian Ocean.\n";
             std::cout << "You must purchase a proper vessel for this dangerous voyage.\n";
-            
+
             bool boatPurchased = false;
             while (!boatPurchased) {
                 displayBoatPurchaseMenu();
                 std::cout << "Enter your choice (1-4): ";
                 int boatChoice = getValidInputWithDemo(1, 4, &tracker, &selectedCamel, &selectedBoat, 5);
-                
+
                 Boat oceanBoat = createOceanBoatChoice(boatChoice);
                 int boatCost = getBoatCost(boatChoice);
-                
+
                 std::cout << "\n=== Ocean Boat Selected ===\n";
                 oceanBoat.displayInfo();
                 std::cout << "Cost: " << boatCost << " coins\n";
-                
+
                 if (tracker.getMoney() < boatCost) {
                     std::cout << "\n*** INSUFFICIENT FUNDS ***\n";
                     std::cout << "You have " << tracker.getMoney() << " coins but need " << boatCost << " coins.\n";
@@ -1563,7 +1585,7 @@ int main() {
                     std::cin.get();
                     return 0;
                 }
-                
+
                 std::cout << "\nConfirm purchase? (y/n): ";
                 char response;
                 std::cin >> response;
@@ -1574,7 +1596,8 @@ int main() {
                     std::cout << "Money remaining: " << tracker.getMoney() << " coins\n";
                     selectedBoat = oceanBoat;
                     boatPurchased = true;
-                } else {
+                }
+                else {
                     std::cout << "Please select a different boat.\n\n";
                 }
             }
@@ -1583,198 +1606,209 @@ int main() {
         bool atStop = true;
         while (atStop) {
             displayStopMenu();
-            
+
             // Show exhaustion warning
             if (tracker.isExhausted()) {
                 std::cout << "\n*** WARNING: Your morale is CRITICALLY LOW! You are EXHAUSTED! ***\n";
                 std::cout << "You MUST rest immediately or face serious consequences!\n";
             }
-            
+
             std::cout << "Enter your choice: ";
             int action = getValidInputWithDemo(1, 4, &tracker, &selectedCamel, &selectedBoat, 4);
 
             switch (action) {
-                case 1: {
-                    int wheatPrice = currentStop.getWheatCost();
-                    int camelFoodPrice = currentStop.getCamelFoodCost();
-                    int weaponryPrice = currentStop.getWeaponryCost();
-                    int patchKitPrice = 20;
+            case 1: {
+                int wheatPrice = currentStop.getWheatCost();
+                int camelFoodPrice = currentStop.getCamelFoodCost();
+                int weaponryPrice = currentStop.getWeaponryCost();
+                int patchKitPrice = 20;
 
-                    // Apply discount if has golden passport
-                    if (tracker.getGoldenPassport()) {
-                        wheatPrice = (wheatPrice * 3) / 4;
-                        camelFoodPrice = (camelFoodPrice * 3) / 4;
-                        weaponryPrice = (weaponryPrice * 3) / 4;
-                        patchKitPrice = 15;
-                        std::cout << "\n*** GOLDEN PASSPORT DISCOUNT APPLIED! ***\n";
-                    }
-
-                    std::cout << "\nSupply options at this stop:\n";
-                    std::cout << "1. Buy " << wheatPrice << " Wheat\n";
-                    std::cout << "2. Buy " << camelFoodPrice << " Camel Food\n";
-                    std::cout << "3. Buy " << weaponryPrice << " Weaponry\n";
-                    
-                    // Advanced weaponry in Persia
-                    if (currentStop.getName() == "Persia") {
-                        std::cout << "4. Browse Advanced Weaponry (swords, bows, armor)\n";
-                        std::cout << "5. Buy Patch Kit (" << patchKitPrice << " coins) - Repairs boat damage\n";
-                        std::cout << "6. Skip purchases\n";
-                    } else {
-                        std::cout << "4. Buy Patch Kit (" << patchKitPrice << " coins) - Repairs boat damage\n";
-                        std::cout << "5. Skip purchases\n";
-                    }
-                    
-                    std::cout << "Enter your choice: ";
-                    int buyChoice;
-                    if (currentStop.getName() == "Persia") {
-                        buyChoice = getValidInputWithDemo(1, 6, &tracker, &selectedCamel, &selectedBoat, 3);
-                    } else {
-                        buyChoice = getValidInputWithDemo(1, 5, &tracker, &selectedCamel, &selectedBoat, 3);
-                    }
-
-                    if (buyChoice == 1) {
-                        tracker.addSupplies(wheatPrice, 0, 0, 0);
-                        std::cout << "Purchased Wheat!\n";
-                        tracker.decreaseMorale(2);
-                    } else if (buyChoice == 2) {
-                        tracker.addSupplies(0, camelFoodPrice, 0, 0);
-                        std::cout << "Purchased Camel Food!\n";
-                        tracker.decreaseMorale(2);
-                    } else if (buyChoice == 3) {
-                        tracker.addSupplies(0, 0, weaponryPrice, 0);
-                        std::cout << "Purchased Weaponry!\n";
-                        tracker.decreaseMorale(2);
-                    } else if (currentStop.getName() == "Persia" && buyChoice == 4) {
-                        AdvancedWeaponry::displayAdvancedWeaponryMenu();
-                        std::cout << "Enter your choice: ";
-                        int weaponChoice = getValidInputWithDemo(1, 5, &tracker, &selectedCamel, &selectedBoat, 3);
-
-                        if (weaponChoice != 5) {
-                            AdvancedWeaponry::Weapon selectedWeapon = AdvancedWeaponry::getWeaponChoice(weaponChoice);
-                            int weaponCost = AdvancedWeaponry::getWeaponCost(weaponChoice);
-
-                            if (tracker.getGoldenPassport()) {
-                                weaponCost = (weaponCost * 3) / 4;
-                                std::cout << "*** GOLDEN PASSPORT DISCOUNT APPLIED! ***\n";
-                            }
-
-                            if (tracker.getMoney() >= weaponCost) {
-                                tracker.addSupplies(0, 0, selectedWeapon.damageBonus, -weaponCost);
-                                std::cout << "\n*** PURCHASED: " << selectedWeapon.name << " ***\n";
-                                std::cout << "Description: " << selectedWeapon.description << "\n";
-                                if (weaponChoice == 4) {
-                                    std::cout << "Combat Bonuses: +20 Melee, +25 Ranged, +15 Defense\n";
-                                } else {
-                                    std::cout << "Bonus: +" << selectedWeapon.damageBonus << " damage\n";
-                                }
-                                std::cout << "Cost: " << weaponCost << " coins\n";
-                                std::cout << "Money remaining: " << tracker.getMoney() << " coins\n";
-                                tracker.decreaseMorale(3);
-                            } else {
-                                std::cout << "Insufficient funds! You need " << weaponCost << " coins.\n";
-                            }
-                        }
-                    } else if ((currentStop.getName() == "Persia" && buyChoice == 5) || (currentStop.getName() != "Persia" && buyChoice == 4)) {
-                        if (tracker.getMoney() >= patchKitPrice) {
-                            tracker.addSupplies(0, 0, 0, -patchKitPrice, 1);
-                            std::cout << "Purchased Patch Kit!\n";
-                            tracker.decreaseMorale(2);
-                        } else {
-                            std::cout << "Insufficient funds! You need " << patchKitPrice << " coins.\n";
-                        }
-                    }
-                    break;
+                // Apply discount if has golden passport
+                if (tracker.getGoldenPassport()) {
+                    wheatPrice = (wheatPrice * 3) / 4;
+                    camelFoodPrice = (camelFoodPrice * 3) / 4;
+                    weaponryPrice = (weaponryPrice * 3) / 4;
+                    patchKitPrice = 15;
+                    std::cout << "\n*** GOLDEN PASSPORT DISCOUNT APPLIED! ***\n";
                 }
-                case 2: {
-                    displayCamelTradingMenu();
-                    std::cout << "Enter your choice: ";
-                    int tradeChoice = getValidInputWithDemo(1, 5, &tracker, &selectedCamel, &selectedBoat, 6);
 
-                    if (tradeChoice != 5) {
-                        int tradeCost;
-                        Camel newCamel = createCamelChoice(tradeChoice == 1 ? 1 : tradeChoice == 2 ? 2 : tradeChoice == 3 ? 3 : 6);
-                        
-                        switch (tradeChoice) {
-                            case 1: tradeCost = 50; break;
-                            case 2: tradeCost = 30; break;
-                            case 3: tradeCost = 70; break;
-                            case 4: tradeCost = 40; break;
-                            default: tradeCost = 50; break;
+                std::cout << "\nSupply options at this stop:\n";
+                std::cout << "1. Buy " << wheatPrice << " Wheat\n";
+                std::cout << "2. Buy " << camelFoodPrice << " Camel Food\n";
+                std::cout << "3. Buy " << weaponryPrice << " Weaponry\n";
+
+                // Advanced weaponry in Persia
+                if (currentStop.getName() == "Persia") {
+                    std::cout << "4. Browse Advanced Weaponry (swords, bows, armor)\n";
+                    std::cout << "5. Buy Patch Kit (" << patchKitPrice << " coins) - Repairs boat damage\n";
+                    std::cout << "6. Skip purchases\n";
+                }
+                else {
+                    std::cout << "4. Buy Patch Kit (" << patchKitPrice << " coins) - Repairs boat damage\n";
+                    std::cout << "5. Skip purchases\n";
+                }
+
+                std::cout << "Enter your choice: ";
+                int buyChoice;
+                if (currentStop.getName() == "Persia") {
+                    buyChoice = getValidInputWithDemo(1, 6, &tracker, &selectedCamel, &selectedBoat, 3);
+                }
+                else {
+                    buyChoice = getValidInputWithDemo(1, 5, &tracker, &selectedCamel, &selectedBoat, 3);
+                }
+
+                if (buyChoice == 1) {
+                    tracker.addSupplies(wheatPrice, 0, 0, 0);
+                    std::cout << "Purchased Wheat!\n";
+                    tracker.decreaseMorale(2);
+                }
+                else if (buyChoice == 2) {
+                    tracker.addSupplies(0, camelFoodPrice, 0, 0);
+                    std::cout << "Purchased Camel Food!\n";
+                    tracker.decreaseMorale(2);
+                }
+                else if (buyChoice == 3) {
+                    tracker.addSupplies(0, 0, weaponryPrice, 0);
+                    std::cout << "Purchased Weaponry!\n";
+                    tracker.decreaseMorale(2);
+                }
+                else if (currentStop.getName() == "Persia" && buyChoice == 4) {
+                    AdvancedWeaponry::displayAdvancedWeaponryMenu();
+                    std::cout << "Enter your choice: ";
+                    int weaponChoice = getValidInputWithDemo(1, 5, &tracker, &selectedCamel, &selectedBoat, 3);
+
+                    if (weaponChoice != 5) {
+                        AdvancedWeaponry::Weapon selectedWeapon = AdvancedWeaponry::getWeaponChoice(weaponChoice);
+                        int weaponCost = AdvancedWeaponry::getWeaponCost(weaponChoice);
+
+                        if (tracker.getGoldenPassport()) {
+                            weaponCost = (weaponCost * 3) / 4;
+                            std::cout << "*** GOLDEN PASSPORT DISCOUNT APPLIED! ***\n";
                         }
 
-                        if (tracker.getMoney() >= tradeCost) {
-                            tracker.addSupplies(0, 0, 0, -tradeCost);
-                            selectedCamel = newCamel;
-                            std::cout << "\n*** Camel Traded! ***\n";
-                            std::cout << "Your new camel:\n";
-                            selectedCamel.displayInfo();
+                        if (tracker.getMoney() >= weaponCost) {
+                            tracker.addSupplies(0, 0, selectedWeapon.damageBonus, -weaponCost);
+                            std::cout << "\n*** PURCHASED: " << selectedWeapon.name << " ***\n";
+                            std::cout << "Description: " << selectedWeapon.description << "\n";
+                            if (weaponChoice == 4) {
+                                std::cout << "Combat Bonuses: +20 Melee, +25 Ranged, +15 Defense\n";
+                            }
+                            else {
+                                std::cout << "Bonus: +" << selectedWeapon.damageBonus << " damage\n";
+                            }
+                            std::cout << "Cost: " << weaponCost << " coins\n";
                             std::cout << "Money remaining: " << tracker.getMoney() << " coins\n";
-                            tracker.decreaseMorale(5);
-                        } else {
-                            std::cout << "Insufficient funds! You need " << tradeCost << " coins.\n";
+                            tracker.decreaseMorale(3);
+                        }
+                        else {
+                            std::cout << "Insufficient funds! You need " << weaponCost << " coins.\n";
                         }
                     }
-                    break;
                 }
-                case 3:
+                else if ((currentStop.getName() == "Persia" && buyChoice == 5) || (currentStop.getName() != "Persia" && buyChoice == 4)) {
+                    if (tracker.getMoney() >= patchKitPrice) {
+                        tracker.addSupplies(0, 0, 0, -patchKitPrice, 1);
+                        std::cout << "Purchased Patch Kit!\n";
+                        tracker.decreaseMorale(2);
+                    }
+                    else {
+                        std::cout << "Insufficient funds! You need " << patchKitPrice << " coins.\n";
+                    }
+                }
+                break;
+            }
+            case 2: {
+                displayCamelTradingMenu();
+                std::cout << "Enter your choice: ";
+                int tradeChoice = getValidInputWithDemo(1, 5, &tracker, &selectedCamel, &selectedBoat, 6);
+
+                if (tradeChoice != 5) {
+                    int tradeCost;
+                    Camel newCamel = createCamelChoice(tradeChoice == 1 ? 1 : tradeChoice == 2 ? 2 : tradeChoice == 3 ? 3 : 6);
+
+                    switch (tradeChoice) {
+                    case 1: tradeCost = 50; break;
+                    case 2: tradeCost = 30; break;
+                    case 3: tradeCost = 70; break;
+                    case 4: tradeCost = 40; break;
+                    default: tradeCost = 50; break;
+                    }
+
+                    if (tracker.getMoney() >= tradeCost) {
+                        tracker.addSupplies(0, 0, 0, -tradeCost);
+                        selectedCamel = newCamel;
+                        std::cout << "\n*** Camel Traded! ***\n";
+                        std::cout << "Your new camel:\n";
+                        selectedCamel.displayInfo();
+                        std::cout << "Money remaining: " << tracker.getMoney() << " coins\n";
+                        tracker.decreaseMorale(5);
+                    }
+                    else {
+                        std::cout << "Insufficient funds! You need " << tradeCost << " coins.\n";
+                    }
+                }
+                break;
+            }
+            case 3:
+                tracker.displaySupplyStatus();
+                if (tracker.isCriticallyLow()) {
+                    std::cout << "\n*** WARNING: Your supplies are critically low! ***\n";
+                }
+                break;
+            case 4: {
+                // MINING MINIGAME OPPORTUNITY AT PERSIA
+                if (currentStop.getName() == "Persia") {
+                    std::cout << "\nBefore you leave Persia, you notice some illegal mining sites...\n";
+                    playMiningMinigame(tracker);
                     tracker.displaySupplyStatus();
-                    if (tracker.isCriticallyLow()) {
-                        std::cout << "\n*** WARNING: Your supplies are critically low! ***\n";
-                    }
-                    break;
-                case 4: {
-                    // MINING MINIGAME OPPORTUNITY AT PERSIA
-                    if (currentStop.getName() == "Persia") {
-                        std::cout << "\nBefore you leave Persia, you notice some illegal mining sites...\n";
-                        playMiningMinigame(tracker);
-                        tracker.displaySupplyStatus();
-                    }
-                    
-                    // Rest option
-                    if (tracker.getMorale() < 100) {
-                        std::cout << "\nYou take time to rest and recover...\n";
-                        tracker.restoreMorale(40);
-                        std::cout << "You feel refreshed! Morale restored to " << tracker.getMorale() << "/100\n";
-                        tracker.decreaseMorale(8);
-                        atStop = false;
-                    } else {
-                        std::cout << "\nYou are already well-rested. Continue your journey.\n";
-                        atStop = false;
-                    }
-                    break;
                 }
+
+                // Rest option
+                if (tracker.getMorale() < 100) {
+                    std::cout << "\nYou take time to rest and recover...\n";
+                    tracker.restoreMorale(40);
+                    std::cout << "You feel refreshed! Morale restored to " << tracker.getMorale() << "/100\n";
+                    tracker.decreaseMorale(8);
+                    atStop = false;
+                }
+                else {
+                    std::cout << "\nYou are already well-rested. Continue your journey.\n";
+                    atStop = false;
+                }
+                break;
+            }
             }
         }
 
         if (i < journeyStops.size() - 1) {
             std::cout << "\nTraveling to next destination...\n";
-            
+
             // Store current supplies before consumption
             int wheatBefore = tracker.getWheat();
             int camelFoodBefore = tracker.getCamelFood();
             int moneyBefore = tracker.getMoney();
-            
+
             // Consume supplies during travel
             int wheatUsed = 5 + (i % 3);
             int camelFoodUsed = 3 + (i % 2);
-            
+
             tracker.addSupplies(-wheatUsed, -camelFoodUsed, 0, 0);
-            
+
             // Morale decreases with travel (exhaustion from journey)
             int moraleLoss = 10 + (i / 2);
             tracker.decreaseMorale(moraleLoss);
-            
+
             std::cout << "\n========== SUPPLY CONSUMPTION REPORT ==========\n";
             std::cout << "--- BEFORE TRAVEL ---\n";
             std::cout << "  Wheat: " << wheatBefore << " units\n";
             std::cout << "  Camel Food: " << camelFoodBefore << " units\n";
             std::cout << "  Money: " << moneyBefore << " coins\n";
-            
+
             std::cout << "\n--- CONSUMED DURING TRAVEL ---\n";
             std::cout << "  Wheat consumed: " << wheatUsed << " units\n";
             std::cout << "  Camel Food consumed: " << camelFoodUsed << " units\n";
             std::cout << "  Morale lost: " << moraleLoss << " points (Travel exhaustion)\n";
-            
+
             std::cout << "\n--- AFTER TRAVEL ---\n";
             std::cout << "  Wheat: " << tracker.getWheat() << " units";
             if (tracker.getWheat() < 0) std::cout << " (DEFICIT!)";
@@ -1785,7 +1819,7 @@ int main() {
             std::cout << "  Money: " << tracker.getMoney() << " coins\n";
             std::cout << "  Morale: " << tracker.getMorale() << "/100 (" << tracker.getMoraleStatus() << ")\n";
             std::cout << "=============================================\n";
-            
+
             // Check if supplies are depleted
             if (tracker.getWheat() < 0 || tracker.getCamelFood() < 0) {
                 std::cout << "\n*** CRITICAL: You have run out of supplies! ***\n";
@@ -1802,9 +1836,9 @@ int main() {
                 std::cout << "GAME OVER\n";
                 break;
             }
-            
+
             tracker.displaySupplyStatus();
-            
+
             if (tracker.isCriticallyLow()) {
                 std::cout << "\n*** WARNING: Supplies are running low! Stock up at the next stop! ***\n";
             }
@@ -1817,11 +1851,11 @@ int main() {
             bool journeyEnded = false;
             RandomEvent::EventType event = RandomEvent::generateRandomEvent(static_cast<int>(i));
             RandomEvent::handleEvent(event, tracker, selectedCamel, selectedBoat, journeyEnded);
-            
+
             if (journeyEnded) {
                 break;
             }
-            
+
             tracker.displaySupplyStatus();
         }
     }
