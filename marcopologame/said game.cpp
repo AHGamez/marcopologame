@@ -22,7 +22,7 @@ void displaySuppliesMenu();
 void displayStopMenu();
 void displayBoatPurchaseMenu();
 void displayCamelTradingMenu();
-void displayPrequel(const string& playerName);
+void displayPrequel();
 void slowPrint(const string& text, int delayMs = 10);
 void playMiningMinigame(SupplyTracker& tracker);
 
@@ -200,26 +200,6 @@ public:
     void setWeaponry(int w) { weaponry = w; }
     void setMoney(int m) { money = m; }
     void setPatchKit(int pk) { patchKit = pk; }
-    void setRubies(int r) { rubies = r; }
-    void setMorale(int mr) { morale = (mr > 100) ? 100 : (mr < 0) ? 0 : mr; }
-
-    void decreaseMorale(int amount) {
-        morale -= amount;
-        if (morale < 0) morale = 0;
-    }
-
-    void restoreMorale(int amount) {
-        morale += amount;
-        if (morale > 100) morale = 100;
-    }
-
-    string getMoraleStatus() const {
-        if (morale >= 80) return "Excellent";
-        else if (morale >= 60) return "Good";
-        else if (morale >= 40) return "Fair";
-        else if (morale >= 20) return "Low";
-        else return "Critical";
-    }
 
     bool buySupplies(int wAmount, int cfAmount, int wpAmount, int mAmount) {
         if (wheat >= wAmount && camelFood >= cfAmount && weaponry >= wpAmount && money >= mAmount) {
@@ -870,21 +850,6 @@ int getValidInput(int minValue, int maxValue) {
     }
 }
 
-// Optimized slow text printing function - faster with skip support
-void slowPrint(const string& text, int delayMs) {
-    for (size_t i = 0; i < text.length(); ++i) {
-        std::cout << text[i] << std::flush;
-
-        // Check if key was pressed (non-blocking)
-        if (_kbhit()) {
-            int key = _getch();
-            if (key == 13) {  // Enter key
-                // Print the rest of the text instantly
-                std::cout << text.substr(i + 1);
-                return;
-            }
-        }
-
         if (delayMs > 0) {
             std::this_thread::sleep_for(std::chrono::milliseconds(delayMs));
         }
@@ -1381,66 +1346,8 @@ public:
     }
 };
 
-void playMiningMinigame(SupplyTracker& tracker) {
-    std::cout << "\n========== ILLEGAL MINING MINIGAME ==========\n";
-    std::cout << "DANGER: If caught, you will be executed!\n";
-    std::cout << "You discover an opportunity to mine precious rubies!\n";
-    std::cout << "If you succeed, you'll gain valuable gems worth a fortune.\n";
-    std::cout << "But if you're caught, you DIE and the journey ends!\n";
-    std::cout << "\nAttempt the mining operation? (y/n): ";
-
-    char response;
-    std::cin >> response;
-
-    if (response != 'y' && response != 'Y') {
-        std::cout << "You decide it's too risky and move on.\n";
-        return;
-    }
-
-    MiningMinigame game;
-    game.play();
-
-    int resourcesGained = game.getResourcesCollected();
-
-    if (resourcesGained > 0) {
-        int rubiesGained = resourcesGained * 3;
-        int coinsFromRubies = rubiesGained * 50;
-
-        tracker.addRubies(rubiesGained);
-        tracker.addSupplies(0, 0, 0, coinsFromRubies);
-
-        std::cout << "\n*** MINING REWARDS ***\n";
-        std::cout << "Gained: " << rubiesGained << " rubies!\n";
-        std::cout << "Rubies converted to coins: " << coinsFromRubies << " coins\n";
-        std::cout << "Morale boost from success!\n";
-        tracker.restoreMorale(15);
-    }
-    else {
-        std::cout << "\nYour mining operation failed!\n";
-        std::cout << "CRITICAL: You were executed by the authorities!\n";
-        std::cout << "GAME OVER - YOUR JOURNEY ENDS HERE\n";
-        tracker.setWheat(-1);  // Trigger game over
-    }
-}
-
 int main() {
-    // Ask for player's name
-    string playerName;
-    std::cout << "Before we begin, what is your name, traveler?\n";
-    std::cout << "Enter your name: ";
-    std::getline(std::cin, playerName);
-
-    if (playerName.empty()) {
-        playerName = "Marco";
-    }
-
-    std::cout << "\nWelcome, " << playerName << "! Your legend begins now.\n\n";
-
-    // Display prequel sequence
-    displayPrequel(playerName);
-
-    std::cout << "Welcome to Marco Polo's Journey to China and Back!\n";
-    std::cout << "Playing as: " << playerName << "\n\n";
+    std::cout << "Welcome to My Game - Marco Polo's Journey to China and Back!\n\n";
 
     // Boat selection
     Boat selectedBoat = Boat();
@@ -1621,13 +1528,6 @@ int main() {
         bool atStop = true;
         while (atStop) {
             displayStopMenu();
-
-            // Show exhaustion warning
-            if (tracker.isExhausted()) {
-                std::cout << "\n*** WARNING: " << playerName << ", your morale is CRITICALLY LOW! You are EXHAUSTED! ***\n";
-                std::cout << "You MUST rest immediately or face serious consequences!\n";
-            }
-
             std::cout << "Enter your choice: ";
             int action = getValidInputWithDemo(1, 4, &tracker, &selectedCamel, &selectedBoat, 4);
 
@@ -1749,45 +1649,26 @@ int main() {
                     default: tradeCost = 50; break;
                     }
 
-                    if (tracker.getMoney() >= tradeCost) {
-                        tracker.addSupplies(0, 0, 0, -tradeCost);
-                        selectedCamel = newCamel;
-                        std::cout << "\n*** Camel Traded! ***\n";
-                        std::cout << "Your new camel:\n";
-                        selectedCamel.displayInfo();
-                        std::cout << "Money remaining: " << tracker.getMoney() << " coins\n";
-                        tracker.decreaseMorale(5);
+                        if (tracker.getMoney() >= tradeCost) {
+                            tracker.addSupplies(0, 0, 0, -tradeCost);
+                            selectedCamel = newCamel;
+                            std::cout << "\n*** Camel Traded! ***\n";
+                            std::cout << "Your new camel:\n";
+                            selectedCamel.displayInfo();
+                            std::cout << "Money remaining: " << tracker.getMoney() << " coins\n";
+                        } else {
+                            std::cout << "Insufficient funds! You need " << tradeCost << " coins.\n";
+                        }
                     }
-                    else {
-                        std::cout << "Insufficient funds! You need " << tradeCost << " coins.\n";
-                    }
+                    break;
                 }
-                break;
-            }
-            case 3:
-                tracker.displaySupplyStatus();
-                if (tracker.isCriticallyLow()) {
-                    std::cout << "\n*** WARNING: Your supplies are critically low! ***\n";
-                }
-                break;
-            case 4: {
-                // MINING MINIGAME OPPORTUNITY AT PERSIA
-                if (currentStop.getName() == "Persia") {
-                    std::cout << "\n" << playerName << ", before you leave Persia, you notice some illegal mining sites...\n";
-                    playMiningMinigame(tracker);
+                case 3:
                     tracker.displaySupplyStatus();
-                }
-
-                // Rest option
-                if (tracker.getMorale() < 100) {
-                    std::cout << "\n" << playerName << ", you take time to rest and recover...\n";
-                    tracker.restoreMorale(40);
-                    std::cout << "You feel refreshed! Morale restored to " << tracker.getMorale() << "/100\n";
-                    tracker.decreaseMorale(8);
-                    atStop = false;
-                }
-                else {
-                    std::cout << "\nYou are already well-rested. Continue your journey.\n";
+                    if (tracker.isCriticallyLow()) {
+                        std::cout << "\n*** WARNING: Your supplies are critically low! ***\n";
+                    }
+                    break;
+                case 4:
                     atStop = false;
                 }
                 break;
@@ -1842,24 +1723,11 @@ int main() {
                 std::cout << "GAME OVER\n";
                 break;
             }
-
-            // Check for exhaustion
-            if (tracker.isExhausted()) {
-                std::cout << "\n*** CRITICAL: " << playerName << ", you are completely exhausted! ***\n";
-                std::cout << "Without rest, you cannot continue...\n";
-                std::cout << "Your journey has ended.\n";
-                std::cout << "GAME OVER\n";
-                break;
-            }
-
+            
             tracker.displaySupplyStatus();
 
             if (tracker.isCriticallyLow()) {
                 std::cout << "\n*** WARNING: Supplies are running low! Stock up at the next stop! ***\n";
-            }
-
-            if (tracker.getMorale() < 30) {
-                std::cout << "\n*** WARNING: " << playerName << ", your morale is dangerously low! Consider resting at the next stop! ***\n";
             }
 
             // Generate random event during travel
