@@ -25,6 +25,7 @@ void displayCamelTradingMenu();
 void displayPrequel(const string& playerName);
 void slowPrint(const string& text, int delayMs = 10);
 void playMiningMinigame(SupplyTracker& tracker);
+void playTravelAnimation(const string& fromStop, const string& toStop, bool isSeaVoyage = false);
 
 class Boat {
 private:
@@ -918,12 +919,12 @@ void displayPrequel(const string& playerName) {
     slowPrint("Nicolo (Your Father):\n");
     slowPrint("\"" + playerName + "! There you are. We've been waiting for you. Listen closely, my son.\n");
     slowPrint("Your uncle and I have just returned from the East. We've traveled roads that few\n");
-    slowPrint("Venetians have ever dared to venture upon. The riches we saw... magnificent!\"\n\n");
+    slowPrint("Venetians have ever dared to venture upon. The riches we saw... magnificent!\"\n\n);
 
     slowPrint("Maffeo (Your Uncle):\n");
     slowPrint("\"Yes, " + playerName + ". We reached the court of the great Kublai Khan himself! The Khan\n");
     slowPrint("has granted us permission to return with tribute and a young man of intelligence.\n");
-    slowPrint("Your father has chosen you for this honor.\"\n\n");
+    slowPrint("Your father has chosen you for this honor.\"\n\n);
 
     slowPrint("You stand stunned, unable to speak. The Kublai Khan? The legendary ruler of the\n");
     slowPrint("Mongol Empire? Your father places a hand on your shoulder.\n\n");
@@ -932,13 +933,13 @@ void displayPrequel(const string& playerName) {
     slowPrint("\"" + playerName + ", you are seventeen now. Too old to hide behind merchant stalls in Venice.\n");
     slowPrint("Too young to waste your potential on the same mundane routes that every trader\n");
     slowPrint("knows by heart. The Khan has heard of our family, and he believes you have the\n");
-    slowPrint("intelligence and cunning to serve him well.\"\n\n");
+    slowPrint("intelligence and cunning to serve him well.\"\n\n);
 
     slowPrint("Maffeo:\n");
     slowPrint("\"The journey will not be easy, nephew. Deserts that stretch for weeks. Mountains\n");
     slowPrint("so high the air itself becomes thin. Bandits, storms, and dangers we cannot\n");
     slowPrint("even name. But the reward... service to the most powerful ruler in the world!\n");
-    slowPrint("And knowledge of lands our civilization has barely heard whispers about.\"\n\n");
+    slowPrint("And knowledge of lands our civilization has barely heard whispers about.\"\n\n);
 
     slowPrint("Your heart pounds in your chest. Fear and excitement battle within you.\n\n");
 
@@ -946,25 +947,25 @@ void displayPrequel(const string& playerName) {
     slowPrint("\"We depart tomorrow at dawn. You will gather supplies today. Choose your boat\n");
     slowPrint("and camel carefully. Your life may depend on these choices. We will provide you\n");
     slowPrint("with enough money and supplies to sustain us through the early stages of our\n");
-    slowPrint("journey, but you must manage them wisely.\"\n\n");
+    slowPrint("journey, but you must manage them wisely.\"\n\n);
 
     slowPrint("Maffeo:\n");
     slowPrint("\"The path to Cathay is long, " + playerName + ". Over 5,000 miles of unknown territory.\n");
     slowPrint("You will face trials that will test your character, your wisdom, and your will.\n");
     slowPrint("But if you succeed, you will have the ear of the Khan himself. You will see\n");
-    slowPrint("wonders beyond imagination.\"\n\n");
+    slowPrint("wonders beyond imagination.\"\n\n);
 
     slowPrint("Your uncle grips your arm firmly.\n\n");
 
     slowPrint("Maffeo:\n");
-    slowPrint("\"Are you ready, " + playerName + "? Ready to become a man of the world?\"\n\n");
+    slowPrint("\"Are you ready, " + playerName + "? Ready to become a man of the world?\"\n\n);
 
     slowPrint("You take a deep breath and nod, your resolve hardening. This is your chance.\n");
     slowPrint("This is destiny.\n\n");
 
     slowPrint("Nicolo:\n");
     slowPrint("\"Excellent. Tomorrow, we embark on a journey that will change everything.\n");
-    slowPrint("Remember, " + playerName + ", fortune favors the bold, but it protects the wise.\"\n\n");
+    slowPrint("Remember, " + playerName + ", fortune favors the bold, but it protects the wise.\"\n\n);
 
     std::cout << "================================================================================\n";
     slowPrint("The sun sets over Venice as you prepare for the greatest adventure of your life.\n");
@@ -1458,6 +1459,126 @@ void playMiningMinigame(SupplyTracker& tracker) {
         std::cout << "CRITICAL: You were executed by the authorities!\n";
         std::cout << "GAME OVER - YOUR JOURNEY ENDS HERE\n";
         tracker.setWheat(-1);  // Trigger game over
+    }
+}
+
+// Travel animation - text person walking/sailing across screen
+void playTravelAnimation(const string& fromStop, const string& toStop, bool isSeaVoyage) {
+    const int SCREEN_WIDTH = 60;
+    const int STEPS = 25;
+    int delayPerStep = 120;
+
+    for (int step = 0; step <= STEPS; ++step) {
+        system("cls");
+
+        int pos = (step * (SCREEN_WIDTH - 12)) / STEPS;
+
+        std::cout << "\n";
+        std::cout << "  ========================================================\n";
+        std::cout << "   " << fromStop << "  -->  " << toStop << "\n";
+        std::cout << "  ========================================================\n\n";
+
+        if (isSeaVoyage) {
+            // Boat animation
+            std::cout << "      ~   *       .          *    .       ~\n";
+            std::cout << "   .        *          .              .\n\n";
+
+            string pad(pos, ' ');
+            if (step % 2 == 0) {
+                std::cout << pad << "     o\n";
+                std::cout << pad << "    /|\\\n";
+                std::cout << pad << "  __|__\\_\n";
+                std::cout << pad << " |       |\n";
+                std::cout << pad << " |_______|\n";
+            }
+            else {
+                std::cout << pad << "     o\n";
+                std::cout << pad << "    /|\\\n";
+                std::cout << pad << " _/__|__\n";
+                std::cout << pad << " |       |\n";
+                std::cout << pad << " |_______|\n";
+            }
+
+            // Water
+            string water = "";
+            for (int w = 0; w < SCREEN_WIDTH + 5; ++w) {
+                water += (((w + step) % 4 == 0) ? '~' : '-');
+            }
+            std::cout << water << "\n";
+            std::cout << water << "\n";
+        }
+        else {
+            // Land / camel rider animation
+            std::cout << "      .   *       .          *    .       .\n";
+            std::cout << "   *        .          *              *\n\n";
+
+            string pad(pos, ' ');
+            if (step % 4 == 0) {
+                std::cout << pad << "    o\n";
+                std::cout << pad << "   /|\\\n";
+                std::cout << pad << "  _/A\\_\n";
+                std::cout << pad << " / / \\ \\\n";
+                std::cout << pad << "  |   |\n";
+            }
+            else if (step % 4 == 1) {
+                std::cout << pad << "    o\n";
+                std::cout << pad << "   /|\\\n";
+                std::cout << pad << "  _/A\\_\n";
+                std::cout << pad << " /  |  \\\n";
+                std::cout << pad << "  /   \\\n";
+            }
+            else if (step % 4 == 2) {
+                std::cout << pad << "    o\n";
+                std::cout << pad << "   /|\\\n";
+                std::cout << pad << "  _/A\\_\n";
+                std::cout << pad << " / / \\ \\\n";
+                std::cout << pad << "  |   |\n";
+            }
+            else {
+                std::cout << pad << "    o\n";
+                std::cout << pad << "   /|\\\n";
+                std::cout << pad << "  _/A\\_\n";
+                std::cout << pad << " \\  |  /\n";
+                std::cout << pad << "  \\   /\n";
+            }
+
+            // Ground with terrain
+            string ground(SCREEN_WIDTH + 5, '_');
+            std::cout << ground << "\n";
+
+            // Terrain details
+            string terrain = "";
+            for (int t = 0; t < SCREEN_WIDTH + 5; ++t) {
+                int v = (t + step * 2) % 12;
+                if (v == 0) terrain += ',';
+                else if (v == 3) terrain += '\'';
+                else if (v == 7) terrain += '.';
+                else terrain += ' ';
+            }
+            std::cout << terrain << "\n";
+        }
+
+        // Progress bar
+        std::cout << "\n";
+        int progressWidth = 40;
+        int filled = (step * progressWidth) / STEPS;
+        std::cout << "  [";
+        for (int j = 0; j < progressWidth; ++j) {
+            if (j < filled) std::cout << "=";
+            else if (j == filled) std::cout << ">";
+            else std::cout << " ";
+        }
+        std::cout << "] " << ((step) * 100) / STEPS << "%\n";
+
+        std::cout << "\n  (Press any key to skip)\n";
+
+        // Skip animation if key pressed
+        if (_kbhit()) {
+            _getch();
+            break;
+        }
+
+        std::this_thread::sleep_for(std::chrono::milliseconds(delayPerStep));
     }
 }
 
