@@ -974,6 +974,7 @@ void displayPrequel(const string& playerName) {
     std::cout << "\n\n";
 
     std::cout << "Press Enter to continue...\n";
+    std::cin.get();
     std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 }
 
@@ -981,85 +982,71 @@ void displayPrequel(const string& playerName) {
 // or change the string names to match your actual image file names.
 vector<JourneyStop> initializeJourneyStops() {
     vector<JourneyStop> stops;
-    // Venice departure - use the Venice return map (shows Venice area)
     stops.push_back(JourneyStop("Venice", 1271,
         "You depart Venice with your father and uncle.\nA bustling Mediterranean port city.\n"
         "FACT: Venice was the center of European trade, controlling Mediterranean commerce\nthrough its powerful merchant republic.",
-        5, 3, 2, "Postal service", "persia to venice return.png"));
+        5, 3, 2, "Postal service"));
         
-    // Mediterranean - use the Indian Ocean map (sea voyage)
     stops.push_back(JourneyStop("Mediterranean Sea Voyage", 1271,
         "You sail across the Mediterranean in a Venetian galley.\nThe sea is both beautiful and treacherous.\n"
         "FACT: Venetian galleys were the primary vessels for Mediterranean trade,\nfeatures multiple sails and could carry large cargo loads across dangerous waters.",
-        6, 4, 2, "", "indian ocean.jpg"));
+        6, 4, 2, ""));
         
-    // Holy Land - near Persia, use Persia map
     stops.push_back(JourneyStop("Holy Land", 1271,
         "You travel through the Holy Land.\nA sacred region filled with historical sites.\n"
         "FACT: The Holy Land was a crucial junction between Europe and Asia,\nwhere merchants exchanged goods and gathered intelligence about Eastern routes.",
-        8, 5, 3, "Spices", "persia.png"));
+        8, 5, 3, "Spices"));
         
-    // Persia - persia.png (exact match)
     stops.push_back(JourneyStop("Persia", 1272,
         "You journey through the Persian Empire.\nA magnificent land of deserts and cities.\n"
         "FACT: Persia was a major crossroads of the Silk Road, where Persian merchants\ncontrolled valuable trade routes and accumulated great wealth from tariffs.",
         10, 6, 4, "Coal heating", "persia.png"));
         
-    // Pamir Mountains - pamir.png (exact match)
     stops.push_back(JourneyStop("Pamir Mountains", 1273,
         "You cross the treacherous Pamir Mountains.\nA dangerous passage through high peaks.\n"
         "FACT: The Pamir Mountains were one of the most dangerous sections of the Silk Road,\nwhere many travelers perished from altitude sickness and extreme weather conditions.",
         12, 8, 5, "Asbestos", "pamir.png"));
         
-    // Kublai Khan's Court - kubi.png (exact match)
     stops.push_back(JourneyStop("Kublai Khan's Court", 1275,
         "You finally reach the court of Kublai Khan!\nA grand city with incredible wealth.\n"
         "FACT: Kublai Khan's court at Xanadu was a cosmopolitan center of power,\nwhere the Khan employed people from across his vast Mongol Empire.",
         6, 4, 3, "Advanced urban cities", "kubi.png"));
         
-    // Southern China - south asia.png (exact match)
     stops.push_back(JourneyStop("Southern China", 1279,
         "You travel to southern China on official missions.\nFascinating new lands and peoples.\n"
         "FACT: Southern China under Kublai Khan was highly urbanized with advanced infrastructure,\nincluding canals, roads, and sophisticated administrative systems.",
         7, 5, 3, "Porcelain", "south asia.png"));
         
-    // Burma - berma.png (exact match)
     stops.push_back(JourneyStop("Burma", 1280,
         "You explore the exotic lands of Burma.\nLush forests and ancient temples await.\n"
         "FACT: Burma was a tributary state of the Mongol Empire, providing exotic goods\nlike rubies, jade, and rare spices to Kublai Khan's court.",
         9, 6, 4, "Petroleum", "berma.png"));
         
-    // Indian Ocean Voyage - indian ocean.jpg (exact match)
     stops.push_back(JourneyStop("Indian Ocean Voyage", 1281,
         "You embark on a perilous journey across the Indian Ocean in a Chinese junk.\nThe vast waters stretch endlessly before you.\n"
         "FACT: Chinese junks were advanced sailing vessels with watertight compartments,\nallowing Marco Polo to safely traverse the Indian Ocean's dangerous waters.",
         10, 8, 5, "", "indian ocean.jpg"));
         
-    // India - south of Burma, reuse south asia.png
     stops.push_back(JourneyStop("India", 1281,
         "You venture into India on behalf of the Khan.\nRich spices and precious gems abound.\n"
         "FACT: India's spice trade was highly valued in medieval times, with pepper,\ncloves, and nutmeg worth their weight in gold in European markets.",
-        8, 7, 4, "Paper money", "south asia.png"));
+        8, 7, 4, "Paper money"));
         
-    // Return Journey - India - reuse indian ocean.jpg (returning by sea)
     stops.push_back(JourneyStop("Return Journey - India", 1292,
         "After 20 years, Kublai Khan permits your return.\nYou begin heading back through familiar lands.\n"
         "FACT: Marco Polo spent over 20 years in service to Kublai Khan,\nbecoming one of the Khan's most trusted and valued foreign advisors.",
-        8, 7, 4, "Maps and Navigation Charts", "indian ocean.jpg"));
+        8, 7, 4, "Maps and Navigation Charts"));
         
-    // Return Journey - Burma - berma.png (same region, return leg)
     stops.push_back(JourneyStop("Return Journey - Burma", 1293,
         "Retracing your steps through Burma.\nThe exotic lands are familiar now.\n"
         "FACT: The return journey was perilous, with many traveling companions perishing\nbefore reaching the relative safety of Persia.",
-        9, 6, 4, "", "berma.png"));
+        9, 6, 4, ""));
         
-    // Return Journey - Persia - return persia.png (exact match)
     stops.push_back(JourneyStop("Return Journey - Persia", 1294,
         "Traveling through Persia on the return voyage.\nThe desert winds guide you home.\n"
         "FACT: Upon returning to Persia, the Polos learned that Kublai Khan had died,\nmaking their service to him part of history.",
         10, 6, 4, "", "return persia.png"));
         
-    // Venice arrival - persia to venice return.png (exact match, shows final leg home)
     stops.push_back(JourneyStop("Venice", 1295,
         "You arrive home in Venice with great wealth!\nYour legendary journey is complete.\n"
         "FACT: When Marco Polo returned to Venice, few believed his stories.\nHe later dictated his adventures to Rustichello da Pisa while imprisoned,\ncreating 'The Travels of Marco Polo', a work that inspired generations.",
@@ -1683,7 +1670,8 @@ int main() {
         }
         std::cout << "\n";
     }
-    std::cout << "=== Journey Summary ===\n";
+
+4std::cout << "=== Journey Summary ===\n";
     std::cout << "Traveler: " << playerName << "\n";
     std::cout << "Your Boat:\n";
     selectedBoat.displayInfo();
@@ -1761,7 +1749,7 @@ int main() {
                 std::cout << "\nConfirm purchase? (y/n): ";
                 char response;
                 std::cin >> response;
-                if ( response == 'y' || response == 'Y') {
+                if (response == 'y' || response == 'Y') {
                     tracker.addSupplies(0, 0, 0, -boatCost);
                     std::cout << "\n*** Boat Purchased! ***\n";
                     std::cout << "You board the " << oceanBoat.getType() << ".\n";
