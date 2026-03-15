@@ -9,6 +9,9 @@
 #include <ctime>
 using namespace std;
 
+// Global god mode flag (toggled from debug menu)
+bool godMode = false;
+
 // Forward declarations
 class SupplyTracker;
 class Camel;
@@ -289,6 +292,10 @@ public:
         if (hasGoldenPassport) {
             std::cout << "*** GOLDEN PASSPORT: You possess the Khan's golden passport! (Discount rates active) ***\n";
         }
+
+        if (godMode) {
+            std::cout << "*** GOD MODE: ACTIVE - You cannot die! ***\n";
+        }
     }
 
     bool isCriticallyLow() const {
@@ -360,9 +367,14 @@ public:
         case CAMEL_DEATH:
             std::cout << "\n*** RANDOM EVENT: CAMEL DEATH ***\n";
             std::cout << getEventDescription(event) << "\n";
-            camel.setAge(999);
-            std::cout << "You lose your camel and must continue on foot!\n";
-            std::cout << "Your travel speed decreases significantly.\n";
+            if (godMode) {
+                std::cout << "*** GOD MODE: Your camel miraculously recovers! ***\n";
+            }
+            else {
+                camel.setAge(999);
+                std::cout << "You lose your camel and must continue on foot!\n";
+                std::cout << "Your travel speed decreases significantly.\n";
+            }
             break;
 
         case BOAT_SINKING:
@@ -433,17 +445,30 @@ public:
             break;
         }
 
-        // Check for critical failures
-        if (camel.getAge() == 999) {
-            std::cout << "\n*** CRITICAL FAILURE: You cannot continue without a camel! ***\n";
-            std::cout << "GAME OVER\n";
-            journeyEnded = true;
-        }
+        // Check for critical failures (skip if god mode)
+        if (!godMode) {
+            if (camel.getAge() == 999) {
+                std::cout << "\n*** CRITICAL FAILURE: You cannot continue without a camel! ***\n";
+                std::cout << "GAME OVER\n";
+                journeyEnded = true;
+            }
 
-        if (tracker.getWheat() < 0 || tracker.getCamelFood() < 0) {
-            std::cout << "\n*** CRITICAL: You have run out of supplies! ***\n";
-            std::cout << "GAME OVER\n";
-            journeyEnded = true;
+            if (tracker.getWheat() < 0 || tracker.getCamelFood() < 0) {
+                std::cout << "\n*** CRITICAL: You have run out of supplies! ***\n";
+                std::cout << "GAME OVER\n";
+                journeyEnded = true;
+            }
+        }
+        else {
+            // In god mode, clamp supplies to 0 minimum so they don't go negative
+            if (tracker.getWheat() < 0) tracker.setWheat(0);
+            if (tracker.getCamelFood() < 0) tracker.setCamelFood(0);
+            if (tracker.getMoney() < 0) tracker.setMoney(0);
+            if (tracker.getWeaponry() < 0) tracker.setWeaponry(0);
+            if (camel.getAge() == 999) {
+                std::cout << "*** GOD MODE: Camel death prevented! ***\n";
+                camel.setAge(10);
+            }
         }
     }
 };
@@ -461,7 +486,8 @@ public:
         std::cout << "3. Edit Supply Prices\n";
         std::cout << "4. Edit RNG Event Thresholds\n";
         std::cout << "5. View Current Supplies\n";
-        std::cout << "6. Exit Debug Menu\n";
+        std::cout << "6. Toggle God Mode (Can't Die) [" << (godMode ? "ON" : "OFF") << "]\n";
+        std::cout << "7. Exit Debug Menu\n";
         std::cout << "Enter your choice: ";
     }
 
@@ -804,6 +830,16 @@ public:
                 tracker.displaySupplyStatus();
             }
             else if (choice == "6") {
+                godMode = !godMode;
+                std::cout << "\n*** GOD MODE: " << (godMode ? "ENABLED" : "DISABLED") << " ***\n";
+                if (godMode) {
+                    std::cout << "You are now invincible! Supply depletion and camel death will not end your game.\n";
+                }
+                else {
+                    std::cout << "You can now die again. Be careful!\n";
+                }
+            }
+            else if (choice == "7") {
                 inDebugMenu = false;
                 std::cout << "\nDebug menu closed. Resuming game...\n";
             }
@@ -855,7 +891,7 @@ int getValidInputWithDemo(int minValue, int maxValue, SupplyTracker* tracker = n
             continue;
         }
     }
-};
+}
 
 // Helper function for number-only input
 int getValidInput(int minValue, int maxValue) {
@@ -919,12 +955,12 @@ void displayPrequel(const string& playerName) {
     slowPrint("Nicolo (Your Father):\n");
     slowPrint("\"" + playerName + "! There you are. We've been waiting for you. Listen closely, my son.\n");
     slowPrint("Your uncle and I have just returned from the East. We've traveled roads that few\n");
-    slowPrint("Venetians have ever dared to venture upon. The riches we saw... magnificent!\"\n\n);
+    slowPrint("Venetians have ever dared to venture upon. The riches we saw... magnificent!\"\n\n");
 
     slowPrint("Maffeo (Your Uncle):\n");
     slowPrint("\"Yes, " + playerName + ". We reached the court of the great Kublai Khan himself! The Khan\n");
     slowPrint("has granted us permission to return with tribute and a young man of intelligence.\n");
-    slowPrint("Your father has chosen you for this honor.\"\n\n);
+    slowPrint("Your father has chosen you for this honor.\"\n\n");
 
     slowPrint("You stand stunned, unable to speak. The Kublai Khan? The legendary ruler of the\n");
     slowPrint("Mongol Empire? Your father places a hand on your shoulder.\n\n");
@@ -933,13 +969,13 @@ void displayPrequel(const string& playerName) {
     slowPrint("\"" + playerName + ", you are seventeen now. Too old to hide behind merchant stalls in Venice.\n");
     slowPrint("Too young to waste your potential on the same mundane routes that every trader\n");
     slowPrint("knows by heart. The Khan has heard of our family, and he believes you have the\n");
-    slowPrint("intelligence and cunning to serve him well.\"\n\n);
+    slowPrint("intelligence and cunning to serve him well.\"\n\n");
 
     slowPrint("Maffeo:\n");
     slowPrint("\"The journey will not be easy, nephew. Deserts that stretch for weeks. Mountains\n");
     slowPrint("so high the air itself becomes thin. Bandits, storms, and dangers we cannot\n");
     slowPrint("even name. But the reward... service to the most powerful ruler in the world!\n");
-    slowPrint("And knowledge of lands our civilization has barely heard whispers about.\"\n\n);
+    slowPrint("And knowledge of lands our civilization has barely heard whispers about.\"\n\n");
 
     slowPrint("Your heart pounds in your chest. Fear and excitement battle within you.\n\n");
 
@@ -947,25 +983,25 @@ void displayPrequel(const string& playerName) {
     slowPrint("\"We depart tomorrow at dawn. You will gather supplies today. Choose your boat\n");
     slowPrint("and camel carefully. Your life may depend on these choices. We will provide you\n");
     slowPrint("with enough money and supplies to sustain us through the early stages of our\n");
-    slowPrint("journey, but you must manage them wisely.\"\n\n);
+    slowPrint("journey, but you must manage them wisely.\"\n\n");
 
     slowPrint("Maffeo:\n");
     slowPrint("\"The path to Cathay is long, " + playerName + ". Over 5,000 miles of unknown territory.\n");
     slowPrint("You will face trials that will test your character, your wisdom, and your will.\n");
     slowPrint("But if you succeed, you will have the ear of the Khan himself. You will see\n");
-    slowPrint("wonders beyond imagination.\"\n\n);
+    slowPrint("wonders beyond imagination.\"\n\n");
 
     slowPrint("Your uncle grips your arm firmly.\n\n");
 
     slowPrint("Maffeo:\n");
-    slowPrint("\"Are you ready, " + playerName + "? Ready to become a man of the world?\"\n\n);
+    slowPrint("\"Are you ready, " + playerName + "? Ready to become a man of the world?\"\n\n");
 
     slowPrint("You take a deep breath and nod, your resolve hardening. This is your chance.\n");
     slowPrint("This is destiny.\n\n");
 
     slowPrint("Nicolo:\n");
     slowPrint("\"Excellent. Tomorrow, we embark on a journey that will change everything.\n");
-    slowPrint("Remember, " + playerName + ", fortune favors the bold, but it protects the wise.\"\n\n);
+    slowPrint("Remember, " + playerName + ", fortune favors the bold, but it protects the wise.\"\n\n");
 
     std::cout << "================================================================================\n";
     slowPrint("The sun sets over Venice as you prepare for the greatest adventure of your life.\n");
@@ -1386,9 +1422,15 @@ public:
                 caught = true;
                 displayGrid();
                 std::cout << "\n*** CAUGHT BY THE GUARD! ***\n";
-                std::cout << "You were apprehended! You died in prison!\n";
-                std::cout << "GAME OVER - MINING FAILURE\n";
-                resourcesCollected = 0;
+                if (godMode) {
+                    std::cout << "*** GOD MODE: You bribed the guard and escaped! ***\n";
+                    resourcesCollected = 0;
+                }
+                else {
+                    std::cout << "You were apprehended! You died in prison!\n";
+                    std::cout << "GAME OVER - MINING FAILURE\n";
+                    resourcesCollected = 0;
+                }
                 std::this_thread::sleep_for(std::chrono::milliseconds(2000));
                 return;
             }
@@ -1410,6 +1452,9 @@ public:
 void playMiningMinigame(SupplyTracker& tracker) {
     std::cout << "\n========== ILLEGAL MINING OPERATION ==========\n";
     std::cout << "DANGER: If caught, you will be executed!\n";
+    if (godMode) {
+        std::cout << "*** GOD MODE ACTIVE: You cannot die, but you won't gain resources if caught! ***\n";
+    }
     std::cout << "You discover an opportunity to mine precious rubies!\n";
     std::cout << "If you succeed, you'll gain valuable gems worth a fortune.\n";
     std::cout << "But if you're caught, you DIE and the journey ends!\n";
@@ -1442,10 +1487,16 @@ void playMiningMinigame(SupplyTracker& tracker) {
         tracker.restoreMorale(15);
     }
     else {
-        std::cout << "\nYour mining operation failed!\n";
-        std::cout << "CRITICAL: You were executed by the authorities!\n";
-        std::cout << "GAME OVER - YOUR JOURNEY ENDS HERE\n";
-        tracker.setWheat(-1);  // Trigger game over
+        if (godMode) {
+            std::cout << "\nYour mining operation failed!\n";
+            std::cout << "*** GOD MODE: You escaped execution but gained nothing. ***\n";
+        }
+        else {
+            std::cout << "\nYour mining operation failed!\n";
+            std::cout << "CRITICAL: You were executed by the authorities!\n";
+            std::cout << "GAME OVER - YOUR JOURNEY ENDS HERE\n";
+            tracker.setWheat(-1);  // Trigger game over
+        }
     }
 }
 
@@ -1568,7 +1619,6 @@ void playTravelAnimation(const string& fromStop, const string& toStop, bool isSe
         std::this_thread::sleep_for(std::chrono::milliseconds(delayPerStep));
     }
 }
-
 int main() {
     // Ask for player's name
     string playerName;
@@ -1671,7 +1721,7 @@ int main() {
         std::cout << "\n";
     }
 
-4std::cout << "=== Journey Summary ===\n";
+    std::cout << "=== Journey Summary ===\n";
     std::cout << "Traveler: " << playerName << "\n";
     std::cout << "Your Boat:\n";
     selectedBoat.displayInfo();
@@ -1736,29 +1786,38 @@ int main() {
                 std::cout << "Cost: " << boatCost << " coins\n";
 
                 if (tracker.getMoney() < boatCost) {
-                    std::cout << "\n*** INSUFFICIENT FUNDS ***\n";
-                    std::cout << "You have " << tracker.getMoney() << " coins but need " << boatCost << " coins.\n";
-                    std::cout << "You cannot proceed without a boat!\n";
-                    std::cout << "Game Over - Insufficient funds for ocean voyage.\n";
-                    std::cout << "\nPress Enter to exit...";
-                    std::cin.ignore();
-                    std::cin.get();
-                    return 0;
-                }
-
-                std::cout << "\nConfirm purchase? (y/n): ";
-                char response;
-                std::cin >> response;
-                if (response == 'y' || response == 'Y') {
-                    tracker.addSupplies(0, 0, 0, -boatCost);
-                    std::cout << "\n*** Boat Purchased! ***\n";
-                    std::cout << "You board the " << oceanBoat.getType() << ".\n";
-                    std::cout << "Money remaining: " << tracker.getMoney() << " coins\n";
-                    selectedBoat = oceanBoat;
-                    boatPurchased = true;
+                    if (godMode) {
+                        std::cout << "\n*** GOD MODE: Boat provided for free! ***\n";
+                        std::cout << "You board the " << oceanBoat.getType() << ".\n";
+                        selectedBoat = oceanBoat;
+                        boatPurchased = true;
+                    }
+                    else {
+                        std::cout << "\n*** INSUFFICIENT FUNDS ***\n";
+                        std::cout << "You have " << tracker.getMoney() << " coins but need " << boatCost << " coins.\n";
+                        std::cout << "You cannot proceed without a boat!\n";
+                        std::cout << "Game Over - Insufficient funds for ocean voyage.\n";
+                        std::cout << "\nPress Enter to exit...";
+                        std::cin.ignore();
+                        std::cin.get();
+                        return 0;
+                    }
                 }
                 else {
-                    std::cout << "Please select a different boat.\n\n";
+                    std::cout << "\nConfirm purchase? (y/n): ";
+                    char response;
+                    std::cin >> response;
+                    if (response == 'y' || response == 'Y') {
+                        tracker.addSupplies(0, 0, 0, -boatCost);
+                        std::cout << "\n*** Boat Purchased! ***\n";
+                        std::cout << "You board the " << oceanBoat.getType() << ".\n";
+                        std::cout << "Money remaining: " << tracker.getMoney() << " coins\n";
+                        selectedBoat = oceanBoat;
+                        boatPurchased = true;
+                    }
+                    else {
+                        std::cout << "Please select a different boat.\n\n";
+                    }
                 }
             }
         }
@@ -1941,6 +2000,15 @@ int main() {
         }
 
         if (i < journeyStops.size() - 1) {
+            // Determine if next leg is a sea voyage
+            bool isSeaLeg = (currentStop.getName() == "Mediterranean Sea Voyage" ||
+                             currentStop.getName() == "Indian Ocean Voyage" ||
+                             journeyStops[i + 1].getName() == "Mediterranean Sea Voyage" ||
+                             journeyStops[i + 1].getName() == "Indian Ocean Voyage");
+
+            // Play travel animation between stops
+            playTravelAnimation(currentStop.getName(), journeyStops[i + 1].getName(), isSeaLeg);
+
             std::cout << "\nTraveling to next destination...\n";
 
             // Store current supplies before consumption
@@ -1983,19 +2051,32 @@ int main() {
 
             // Check if supplies are depleted
             if (tracker.getWheat() < 0 || tracker.getCamelFood() < 0) {
-                std::cout << "\n*** CRITICAL: " << playerName << ", you have run out of supplies! ***\n";
-                std::cout << "Your journey has ended prematurely.\n";
-                std::cout << "GAME OVER\n";
-                break;
+                if (godMode) {
+                    std::cout << "\n*** GOD MODE: Supplies depleted but you push forward! ***\n";
+                    if (tracker.getWheat() < 0) tracker.setWheat(0);
+                    if (tracker.getCamelFood() < 0) tracker.setCamelFood(0);
+                }
+                else {
+                    std::cout << "\n*** CRITICAL: " << playerName << ", you have run out of supplies! ***\n";
+                    std::cout << "Your journey has ended prematurely.\n";
+                    std::cout << "GAME OVER\n";
+                    break;
+                }
             }
 
             // Check for exhaustion
             if (tracker.isExhausted()) {
-                std::cout << "\n*** CRITICAL: " << playerName << ", you are completely exhausted! ***\n";
-                std::cout << "Without rest, you cannot continue...\n";
-                std::cout << "Your journey has ended.\n";
-                std::cout << "GAME OVER\n";
-                break;
+                if (godMode) {
+                    std::cout << "\n*** GOD MODE: You are exhausted but divine energy keeps you going! ***\n";
+                    tracker.restoreMorale(20);
+                }
+                else {
+                    std::cout << "\n*** CRITICAL: " << playerName << ", you are completely exhausted! ***\n";
+                    std::cout << "Without rest, you cannot continue...\n";
+                    std::cout << "Your journey has ended.\n";
+                    std::cout << "GAME OVER\n";
+                    break;
+                }
             }
 
             tracker.displaySupplyStatus();
