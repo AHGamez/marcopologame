@@ -26,7 +26,7 @@ void displayStopMenu();
 void displayBoatPurchaseMenu();
 void displayCamelTradingMenu();
 void displayPrequel(const string& playerName);
-void slowPrint(const string& text, int delayMs = 10);
+void slowPrint(const string& text, int delayMs = 5);
 void playMiningMinigame(SupplyTracker& tracker);
 void playTravelAnimation(const string& fromStop, const string& toStop, bool isSeaVoyage = false);
 
@@ -144,14 +144,12 @@ private:
     int camelFoodCost;
     int weaponryCost;
     string discovery;
-    string mapImageFile;
 
 public:
     JourneyStop(const string& stopName, int stopYear, const string& stopDesc,
-        int wCost, int cfCost, int wpCost, const string& stopDiscovery = "",
-        const string& mapImage = "")
+        int wCost, int cfCost, int wpCost, const string& stopDiscovery = "")
         : name(stopName), year(stopYear), description(stopDesc),
-        wheatCost(wCost), camelFoodCost(cfCost), weaponryCost(wpCost), discovery(stopDiscovery), mapImageFile(mapImage) {
+        wheatCost(wCost), camelFoodCost(cfCost), weaponryCost(wpCost), discovery(stopDiscovery) {
     }
 
     string getName() const { return name; }
@@ -164,13 +162,6 @@ public:
 
     void displayStop() const {
         std::cout << "\n=== " << year << " - " << name << " ===\n";
-        
-        // Output image if one is attached to this segment
-        if (!mapImageFile.empty()) {
-            std::cout << "[>>> Opening Map: " << mapImageFile << " <<<]\n";
-            string command = "start \"\" \"" + mapImageFile + "\"";
-            system(command.c_str());
-        }
 
         std::cout << description << "\n";
         if (!discovery.empty()) {
@@ -946,66 +937,66 @@ void displayPrequel(const string& playerName) {
     std::cout << "================================================================================\n";
     std::cout << "\n";
 
-    slowPrint("VENICE, 1271\n");
-    slowPrint("The bustling port city of Venice thrums with the energy of merchants, sailors, and\n");
-    slowPrint("traders. The salty sea air fills your lungs as you stand at the dock, watching ships\n");
-    slowPrint("arrive and depart to distant lands. Your father, Nicolo Polo, has called you to\n");
-    slowPrint("meet him and your Uncle Maffeo at the harbor.\n\n");
+    slowPrint("VENICE, 1271\n", 2);
+    slowPrint("The bustling port city of Venice thrums with the energy of merchants, sailors, and\n", 2);
+    slowPrint("traders. The salty sea air fills your lungs as you stand at the dock, watching ships\n", 2);
+    slowPrint("arrive and depart to distant lands. Your father, Nicolo Polo, has called you to\n", 2);
+    slowPrint("meet him and your Uncle Maffeo at the harbor.\n\n", 2);
 
-    slowPrint("Nicolo (Your Father):\n");
-    slowPrint("\"" + playerName + "! There you are. We've been waiting for you. Listen closely, my son.\n");
-    slowPrint("Your uncle and I have just returned from the East. We've traveled roads that few\n");
-    slowPrint("Venetians have ever dared to venture upon. The riches we saw... magnificent!\"\n\n");
+    slowPrint("Nicolo (Your Father):\n", 2);
+    slowPrint("\"" + playerName + "! There you are. We've been waiting for you. Listen closely, my son.\n", 2);
+    slowPrint("Your uncle and I have just returned from the East. We've traveled roads that few\n", 2);
+    slowPrint("Venetians have ever dared to venture upon. The riches we saw... magnificent!\"\n\n", 2);
 
-    slowPrint("Maffeo (Your Uncle):\n");
-    slowPrint("\"Yes, " + playerName + ". We reached the court of the great Kublai Khan himself! The Khan\n");
-    slowPrint("has granted us permission to return with tribute and a young man of intelligence.\n");
-    slowPrint("Your father has chosen you for this honor.\"\n\n");
+    slowPrint("Maffeo (Your Uncle):\n", 2);
+    slowPrint("\"Yes, " + playerName + ". We reached the court of the great Kublai Khan himself! The Khan\n", 2);
+    slowPrint("has granted us permission to return with tribute and a young man of intelligence.\n", 2);
+    slowPrint("Your father has chosen you for this honor.\"\n\n", 2);
 
-    slowPrint("You stand stunned, unable to speak. The Kublai Khan? The legendary ruler of the\n");
-    slowPrint("Mongol Empire? Your father places a hand on your shoulder.\n\n");
+    slowPrint("You stand stunned, unable to speak. The Kublai Khan? The legendary ruler of the\n", 2);
+    slowPrint("Mongol Empire? Your father places a hand on your shoulder.\n\n", 2);
 
-    slowPrint("Nicolo:\n");
-    slowPrint("\"" + playerName + ", you are seventeen now. Too old to hide behind merchant stalls in Venice.\n");
-    slowPrint("Too young to waste your potential on the same mundane routes that every trader\n");
-    slowPrint("knows by heart. The Khan has heard of our family, and he believes you have the\n");
-    slowPrint("intelligence and cunning to serve him well.\"\n\n");
+    slowPrint("Nicolo:\n", 2);
+    slowPrint("\"" + playerName + ", you are seventeen now. Too old to hide behind merchant stalls in Venice.\n", 2);
+    slowPrint("Too young to waste your potential on the same mundane routes that every trader\n", 2);
+    slowPrint("knows by heart. The Khan has heard of our family, and he believes you have the\n", 2);
+    slowPrint("intelligence and cunning to serve him well.\"\n\n", 2);
 
-    slowPrint("Maffeo:\n");
-    slowPrint("\"The journey will not be easy, nephew. Deserts that stretch for weeks. Mountains\n");
-    slowPrint("so high the air itself becomes thin. Bandits, storms, and dangers we cannot\n");
-    slowPrint("even name. But the reward... service to the most powerful ruler in the world!\n");
-    slowPrint("And knowledge of lands our civilization has barely heard whispers about.\"\n\n");
+    slowPrint("Maffeo:\n", 2);
+    slowPrint("\"The journey will not be easy, nephew. Deserts that stretch for weeks. Mountains\n", 2);
+    slowPrint("so high the air itself becomes thin. Bandits, storms, and dangers we cannot\n", 2);
+    slowPrint("even name. But the reward... service to the most powerful ruler in the world!\n", 2);
+    slowPrint("And knowledge of lands our civilization has barely heard whispers about.\"\n\n", 2);
 
-    slowPrint("Your heart pounds in your chest. Fear and excitement battle within you.\n\n");
+    slowPrint("Your heart pounds in your chest. Fear and excitement battle within you.\n\n", 2);
 
-    slowPrint("Nicolo:\n");
-    slowPrint("\"We depart tomorrow at dawn. You will gather supplies today. Choose your boat\n");
-    slowPrint("and camel carefully. Your life may depend on these choices. We will provide you\n");
-    slowPrint("with enough money and supplies to sustain us through the early stages of our\n");
-    slowPrint("journey, but you must manage them wisely.\"\n\n");
+    slowPrint("Nicolo:\n", 2);
+    slowPrint("\"We depart tomorrow at dawn. You will gather supplies today. Choose your boat\n", 2);
+    slowPrint("and camel carefully. Your life may depend on these choices. We will provide you\n", 2);
+    slowPrint("with enough money and supplies to sustain us through the early stages of our\n", 2);
+    slowPrint("journey, but you must manage them wisely.\"\n\n", 2);
 
-    slowPrint("Maffeo:\n");
-    slowPrint("\"The path to Cathay is long, " + playerName + ". Over 5,000 miles of unknown territory.\n");
-    slowPrint("You will face trials that will test your character, your wisdom, and your will.\n");
-    slowPrint("But if you succeed, you will have the ear of the Khan himself. You will see\n");
-    slowPrint("wonders beyond imagination.\"\n\n");
+    slowPrint("Maffeo:\n", 2);
+    slowPrint("\"The path to Cathay is long, " + playerName + ". Over 5,000 miles of unknown territory.\n", 2);
+    slowPrint("You will face trials that will test your character, your wisdom, and your will.\n", 2);
+    slowPrint("But if you succeed, you will have the ear of the Khan himself. You will see\n", 2);
+    slowPrint("wonders beyond imagination.\"\n\n", 2);
 
-    slowPrint("Your uncle grips your arm firmly.\n\n");
+    slowPrint("Your uncle grips your arm firmly.\n\n", 2);
 
-    slowPrint("Maffeo:\n");
-    slowPrint("\"Are you ready, " + playerName + "? Ready to become a man of the world?\"\n\n");
+    slowPrint("Maffeo:\n", 2);
+    slowPrint("\"Are you ready, " + playerName + "? Ready to become a man of the world?\"\n\n", 2);
 
-    slowPrint("You take a deep breath and nod, your resolve hardening. This is your chance.\n");
-    slowPrint("This is destiny.\n\n");
+    slowPrint("You take a deep breath and nod, your resolve hardening. This is your chance.\n", 2);
+    slowPrint("This is destiny.\n\n", 2);
 
-    slowPrint("Nicolo:\n");
-    slowPrint("\"Excellent. Tomorrow, we embark on a journey that will change everything.\n");
-    slowPrint("Remember, " + playerName + ", fortune favors the bold, but it protects the wise.\"\n\n");
+    slowPrint("Nicolo:\n", 2);
+    slowPrint("\"Excellent. Tomorrow, we embark on a journey that will change everything.\n", 2);
+    slowPrint("Remember, " + playerName + ", fortune favors the bold, but it protects the wise.\"\n\n", 2);
 
     std::cout << "================================================================================\n";
-    slowPrint("The sun sets over Venice as you prepare for the greatest adventure of your life.\n");
-    slowPrint("Your journey to the court of Kublai Khan is about to begin...\n");
+    slowPrint("The sun sets over Venice as you prepare for the greatest adventure of your life.\n", 2);
+    slowPrint("Your journey to the court of Kublai Khan is about to begin...\n", 2);
     std::cout << "================================================================================\n";
     std::cout << "\n\n";
 
@@ -1014,8 +1005,6 @@ void displayPrequel(const string& playerName) {
     std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 }
 
-// NOTE: Make sure the following file names exist in same folder as the exe
-// or change the string names to match your actual image file names.
 vector<JourneyStop> initializeJourneyStops() {
     vector<JourneyStop> stops;
     stops.push_back(JourneyStop("Venice", 1271,
@@ -1036,32 +1025,32 @@ vector<JourneyStop> initializeJourneyStops() {
     stops.push_back(JourneyStop("Persia", 1272,
         "You journey through the Persian Empire.\nA magnificent land of deserts and cities.\n"
         "FACT: Persia was a major crossroads of the Silk Road, where Persian merchants\ncontrolled valuable trade routes and accumulated great wealth from tariffs.",
-        10, 6, 4, "Coal heating", "persia.png"));
+        10, 6, 4, "Coal heating"));
         
     stops.push_back(JourneyStop("Pamir Mountains", 1273,
         "You cross the treacherous Pamir Mountains.\nA dangerous passage through high peaks.\n"
         "FACT: The Pamir Mountains were one of the most dangerous sections of the Silk Road,\nwhere many travelers perished from altitude sickness and extreme weather conditions.",
-        12, 8, 5, "Asbestos", "pamir.png"));
+        12, 8, 5, "Asbestos"));
         
     stops.push_back(JourneyStop("Kublai Khan's Court", 1275,
         "You finally reach the court of Kublai Khan!\nA grand city with incredible wealth.\n"
         "FACT: Kublai Khan's court at Xanadu was a cosmopolitan center of power,\nwhere the Khan employed people from across his vast Mongol Empire.",
-        6, 4, 3, "Advanced urban cities", "kubi.png"));
+        6, 4, 3, "Advanced urban cities"));
         
     stops.push_back(JourneyStop("Southern China", 1279,
         "You travel to southern China on official missions.\nFascinating new lands and peoples.\n"
         "FACT: Southern China under Kublai Khan was highly urbanized with advanced infrastructure,\nincluding canals, roads, and sophisticated administrative systems.",
-        7, 5, 3, "Porcelain", "south asia.png"));
+        7, 5, 3, "Porcelain"));
         
     stops.push_back(JourneyStop("Burma", 1280,
         "You explore the exotic lands of Burma.\nLush forests and ancient temples await.\n"
         "FACT: Burma was a tributary state of the Mongol Empire, providing exotic goods\nlike rubies, jade, and rare spices to Kublai Khan's court.",
-        9, 6, 4, "Petroleum", "berma.png"));
+        9, 6, 4, "Petroleum"));
         
     stops.push_back(JourneyStop("Indian Ocean Voyage", 1281,
         "You embark on a perilous journey across the Indian Ocean in a Chinese junk.\nThe vast waters stretch endlessly before you.\n"
         "FACT: Chinese junks were advanced sailing vessels with watertight compartments,\nallowing Marco Polo to safely traverse the Indian Ocean's dangerous waters.",
-        10, 8, 5, "", "indian ocean.jpg"));
+        10, 8, 5, ""));
         
     stops.push_back(JourneyStop("India", 1281,
         "You venture into India on behalf of the Khan.\nRich spices and precious gems abound.\n"
@@ -1081,12 +1070,12 @@ vector<JourneyStop> initializeJourneyStops() {
     stops.push_back(JourneyStop("Return Journey - Persia", 1294,
         "Traveling through Persia on the return voyage.\nThe desert winds guide you home.\n"
         "FACT: Upon returning to Persia, the Polos learned that Kublai Khan had died,\nmaking their service to him part of history.",
-        10, 6, 4, "", "return persia.png"));
+        10, 6, 4, ""));
         
     stops.push_back(JourneyStop("Venice", 1295,
         "You arrive home in Venice with great wealth!\nYour legendary journey is complete.\n"
         "FACT: When Marco Polo returned to Venice, few believed his stories.\nHe later dictated his adventures to Rustichello da Pisa while imprisoned,\ncreating 'The Travels of Marco Polo', a work that inspired generations.",
-        0, 0, 0, "", "persia to venice return.png"));
+        0, 0, 0, ""));
         
     return stops;
 }
@@ -1431,7 +1420,7 @@ public:
                     std::cout << "GAME OVER - MINING FAILURE\n";
                     resourcesCollected = 0;
                 }
-                std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+                std::this_thread::sleep_for(std::chrono::milliseconds(800));
                 return;
             }
 
@@ -1612,7 +1601,7 @@ void playTravelAnimation(const string& fromStop, const string& toStop, bool isSe
 
         // Skip animation if key pressed
         if (_kbhit()) {
-            _getch();
+            (void)_getch();
             break;
         }
 
